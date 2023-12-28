@@ -1,3 +1,4 @@
+import Mathlib
 import Lt.Mx
 
 def maxOfListAux (as: List Nat) (curr: Nat) : Nat :=
@@ -5,7 +6,7 @@ def maxOfListAux (as: List Nat) (curr: Nat) : Nat :=
   | [] => curr
   | a::as' => maxOfListAux (as') (mx a curr)
 
-def maxOfListAuxGeCurr (as:List Nat) (curr: Nat) : curr ≤ maxOfListAux as curr := by
+theorem maxOfListAuxGeCurr (as:List Nat) (curr: Nat) : curr ≤ maxOfListAux as curr := by
   induction as generalizing curr with
   | nil =>
     simp [maxOfListAux]
@@ -19,7 +20,7 @@ def maxOfListAuxGeCurr (as:List Nat) (curr: Nat) : curr ≤ maxOfListAux as curr
       rw [mx_symm, mx_takes_gt q]
       exact ih curr
 
-def maxOfListMoreCurrIsHigher (as:List Nat)  : a ≤ b → maxOfListAux as a ≤ maxOfListAux as b := by
+theorem maxOfListMoreCurrIsHigher (as:List Nat)  : a ≤ b → maxOfListAux as a ≤ maxOfListAux as b := by
   intro a_le_b
   induction as generalizing a b with
     unfold maxOfListAux
@@ -44,48 +45,29 @@ def maxElement (ar : Array Nat) (h: ar.size > 0) : Nat :=
   exact Nat.succ_pos 4
 })
 
-def maxBiggerThanFirstOfList (as:List Nat) (h: as.length>0) : maxOfList as h ≥ List.get as ⟨0, h⟩  := by
-  cases as with
-  | nil =>
-    rw [List.length] at h
-    exact False.elim ((Nat.not_lt_zero 0) h)
-  | cons a as' =>
-    rw [List.get, maxOfList]
-    simp
-    exact maxOfListAuxGeCurr _ _
-
-def maxBiggerThanFirst (ar:Array Nat) (h: ar.size>0) : maxElement ar h ≥ ar.get ⟨0, h⟩ := by
-  apply maxBiggerThanFirstOfList ar.data h
-
-def maxBiggerThanIthOfList (as:List Nat) (h: as.length>0) (idx: Fin as.length) : maxOfList as h ≥ List.get as idx  := by
+theorem maxOfList_returns_maximum (as : List Nat) (h : as.length > 0) :
+  ∀ (y : Nat), y ∈ as → y ≤ maxOfList as h := by
+  intro y y_in_as
   induction as with
-  | nil =>
-    rw [List.length] at h
-    exact False.elim ((Nat.not_lt_zero 0) h)
+  | nil => exact False.elim (Nat.not_lt_zero 0 h)
   | cons a as' ih =>
-    match idx with
-    | ⟨0, _⟩ => exact maxBiggerThanFirstOfList (a::as') (Nat.succ_pos _)
-    | ⟨Nat.succ b, ihh⟩ =>
-      simp [maxOfList, List.get]
-      have h2: List.length as' > b := by {
-        rw [List.length, Nat.add_one] at ihh
-        exact Nat.lt_of_succ_lt_succ ihh
-      }
-      have h3: List.length as' > 0 := (Nat.zero_lt_of_lt h2)
-      specialize ih h3 ⟨b, h2⟩
-      cases as' with
-      | nil =>
-        simp [List.length] at ihh
-        have q:= Nat.le_of_lt_succ ihh
-        exact False.elim (Nat.not_succ_le_zero b q)
-      | cons a' as'' =>
-        unfold maxOfList at ih
-        simp at ih
-        unfold maxOfListAux
-        have q:= maxOfListMoreCurrIsHigher as'' (mx_bigger_than_fst a' a)
-        exact Nat.le_trans ih q
-
-def maxBiggerThanAll (ar:Array Nat) (h: ar.size>0) : ∀ idx:Fin ar.size, maxElement ar h ≥ ar.get idx := by
-  intro idx
-  rw [Array.get, maxElement]
-  apply maxBiggerThanIthOfList (ar.data) h idx
+    cases as' with
+    | nil =>
+      simp [maxOfList, maxOfListAux]
+      simp at y_in_as
+      rw [y_in_as]
+    | cons a' as'' =>
+      simp at y_in_as
+      simp [maxOfList, maxOfListAux] at *
+      match y_in_as with
+      | Or.inl h2 =>
+        rw [h2]
+        have hyp :maxOfListAux as'' a ≤ maxOfListAux as'' (mx a' a) := by {
+          rw [mx_symm]
+          apply maxOfListMoreCurrIsHigher as'' (mx_bigger_than_fst a a')
+        }
+        exact Nat.le_trans (maxOfListAuxGeCurr as'' a) hyp
+      | Or.inr h2 =>
+        specialize ih h2
+        have hyp :maxOfListAux as'' a' ≤ maxOfListAux as'' (mx a' a) := maxOfListMoreCurrIsHigher as'' (mx_bigger_than_fst a' a)
+        exact Nat.le_trans ih hyp
