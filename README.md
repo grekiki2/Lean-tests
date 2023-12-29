@@ -1,0 +1,1 @@
+Malo Lean4 eksperimentiranja. Tale repo je bolj za backup kot kakšno koristno stvar. 
