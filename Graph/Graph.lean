@@ -13,7 +13,7 @@ def GraphConnected (G:Graph) (a b:Fin G.vertexSize) : Bool :=
   (G.connected_decidable a b).decide
 
 def valid_coloring (G:Graph) (coloring: Fin G.vertexSize → Nat): Prop :=
-  ∀ a b, G.connected a b → coloring a ≠ coloring b
+  ∀ a b, GraphConnected G a b → coloring a ≠ coloring b
 
 def G_example : Graph := {vertexSize:=4, connected:=(λ x y=>x ≠ y), connected_decidable := by {simp; intro a b;apply Not.decidable}, irreflexive := by simp, symmetric:= by {apply Ne.symm} }
 
@@ -37,7 +37,7 @@ def Graph2Connected (G2: Graph2) (i j:Fin G2.vertexSize) : Bool :=
   Array.contains (G2.edgeList[i]'(by {rw [G2.edgeListSize]; exact Fin.prop i})) j
 
 def valid_coloring2 (G2:Graph2) (coloring: Fin G2.vertexSize → Nat): Prop :=
-  ∀ i:Fin G2.vertexSize, ∀ j ∈ G2.edgeList[i]'(by {rw [G2.edgeListSize]; exact Fin.prop i}), coloring i ≠ coloring j
+  ∀ i j:Fin G2.vertexSize, Graph2Connected G2 i j → coloring i ≠ coloring j
 
 -- Plan: konverzijske funkcije iz Graph v Graph2 in obratno, dokaz bijektivnosti?, dokaz da valid_coloring2 inducira valid_coloring
 -- Potem pa lahko definiramo fukncijo ki dejansko izracuna coloring na Graph2, dokazemo da je pravilna
@@ -184,5 +184,17 @@ theorem connected_iff (G:Graph): GraphConnected G = Graph2Connected (convertGrap
       exact h2.symm
     | false => rfl
 
--- theorem colorings_convert (G: Graph) (coloring: Fin G.vertexSize → Nat) (h: valid_coloring G coloring): valid_coloring2 (convertGraphToGraph2 G) coloring := by
---   unfold valid_coloring at h
+theorem colorings_convert (G: Graph) (coloring: Fin G.vertexSize → Nat): valid_coloring G coloring ↔ valid_coloring2 (convertGraphToGraph2 G) coloring := by
+  constructor
+  · intro h
+    unfold valid_coloring at h
+    unfold valid_coloring2
+    intro i j cij
+    rw [← connected_iff] at cij
+    exact h i j cij
+  · intro h
+    unfold valid_coloring2 at h
+    unfold valid_coloring
+    intro i j cij
+    rw [connected_iff] at cij
+    exact h i j cij
