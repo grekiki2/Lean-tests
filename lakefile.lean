@@ -5,6 +5,7 @@ package alg
 
 lean_lib Lt
 lean_lib Gt
+lean_lib Graph
 
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
