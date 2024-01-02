@@ -14,6 +14,9 @@ def GraphConnected (G:Graph) (a b:Fin G.vertexSize) : Bool :=
 
 instance (G:Graph): DecidableRel G.connected := G.connected_decidable
 
+def K_n (k:Nat) : Graph :=
+  {vertexSize:=k, connected:=(λ x y=>x ≠ y), connected_decidable := by simp; intro a b;apply Not.decidable, irreflexive := by simp, symmetric:= by apply Ne.symm }
+
 structure Graph2 : Type :=
   vertexSize : Nat
   edgeList: Array (Array (Fin vertexSize))
