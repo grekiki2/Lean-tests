@@ -12,17 +12,7 @@ structure Graph : Type :=
 def GraphConnected (G:Graph) (a b:Fin G.vertexSize) : Bool :=
   (G.connected_decidable a b).decide
 
-def valid_coloring (G:Graph) (coloring: Fin G.vertexSize → Fin k): Prop :=
-  ∀ a b, GraphConnected G a b → coloring a ≠ coloring b
-
-def G_example : Graph := {vertexSize:=4, connected:=(λ x y=>x ≠ y), connected_decidable := by {simp; intro a b;apply Not.decidable}, irreflexive := by simp, symmetric:= by {apply Ne.symm} }
-
 instance (G:Graph): DecidableRel G.connected := G.connected_decidable
-
-#eval G_example.vertexSize
-
-#eval G_example.connected ⟨0, by decide⟩ ⟨0, by decide⟩
-
 
 structure Graph2 : Type :=
   vertexSize : Nat
@@ -36,8 +26,6 @@ structure Graph2 : Type :=
 def Graph2Connected (G2: Graph2) (i j:Fin G2.vertexSize) : Bool :=
   Array.contains (G2.edgeList[i]'(by {rw [G2.edgeListSize]; exact Fin.prop i})) j
 
-def valid_coloring2 (G2:Graph2) (coloring: Fin G2.vertexSize → Fin k): Prop :=
-  ∀ i j:Fin G2.vertexSize, Graph2Connected G2 i j → coloring i ≠ coloring j
 
 -- Plan: konverzijske funkcije iz Graph v Graph2 in obratno, dokaz bijektivnosti?, dokaz da valid_coloring2 inducira valid_coloring
 -- Potem pa lahko definiramo fukncijo ki dejansko izracuna coloring na Graph2, dokazemo da je pravilna
@@ -51,6 +39,7 @@ def getEdgeListGtoG2 (G:Graph) : Array (Array (Fin G.vertexSize)) :=
   let ls := List.map (λ idx => getEdgeListForNode G idx) (List.finRange G.vertexSize)
   List.toArray ls
 
+-- Delo z Arrayi ni najbolj enostavno tako da potrebujemo ene par pomožnih lem
 #check Array.toArray_data
 #check Array.data_toArray
 lemma list_array_idx_equiv (as: List α) (idx: Fin as.length): (List.toArray as)[idx] = as[idx] := by
@@ -67,7 +56,6 @@ lemma list_array_idx_val_equiv (as: List α) (idx: Fin as.length): (List.toArray
   rw [array_idx_val_equiv (List.toArray as) ⟨idx.val, by simp⟩]
   exact list_array_idx_equiv as idx
 
-#eval getEdgeListGtoG2 G_example
 #check List.of_mem_filter
 #check List.mem_filter
 theorem Array.mem_iff_contains {α : Type _} [DecidableEq α] {a : α} {as : Array α} : a ∈ as ↔ as.contains a := by
@@ -105,8 +93,6 @@ def convertGraphToGraph2 (G:Graph) : Graph2 :=
     exact Graph.symmetric G i j q
   }}
 
-#eval (convertGraphToGraph2 (G_example)).edgeList
-
 lemma list_array_contains_eq {α : Type} [DecidableEq α] (as : List α) (b : α) : Array.contains (List.toArray as) b = List.contains as b := by
   refine Bool.eq_iff_eq_true_iff.mpr ?_
   constructor
@@ -122,7 +108,6 @@ lemma list_array_contains_eq {α : Type} [DecidableEq α] (as : List α) (b : α
     }
     rw [Array.data_toArray]
     exact List.mem_of_elem_eq_true h
-
 
 lemma in_rw (as: List Nat) (b:Nat): List.contains as b = (b ∈ as) := by
   refine (propext ?_).symm
@@ -159,6 +144,7 @@ lemma list_contains_filter  {α : Type u} [BEq α] [LawfulBEq α] (as: List α) 
 
 #check list_contains_filter
 
+-- Glavni izrek
 theorem connected_iff (G:Graph): GraphConnected G = Graph2Connected (convertGraphToGraph2 G) := by
   unfold GraphConnected Graph2Connected
   funext i j
@@ -183,18 +169,3 @@ theorem connected_iff (G:Graph): GraphConnected G = Graph2Connected (convertGrap
       rw [h] at h2
       exact h2.symm
     | false => rfl
-
-theorem colorings_convert (G: Graph) (coloring: Fin G.vertexSize → Fin k): valid_coloring G coloring ↔ valid_coloring2 (convertGraphToGraph2 G) coloring := by
-  constructor
-  · intro h
-    unfold valid_coloring at h
-    unfold valid_coloring2
-    intro i j cij
-    rw [← connected_iff] at cij
-    exact h i j cij
-  · intro h
-    unfold valid_coloring2 at h
-    unfold valid_coloring
-    intro i j cij
-    rw [connected_iff] at cij
-    exact h i j cij
