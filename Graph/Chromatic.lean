@@ -26,10 +26,30 @@ def is_k_colorable2 (G2: Graph2) (k: Nat) : Prop :=
 
 instance {G2 : Graph2} (k : Nat) : Decidable (is_k_colorable2 G2 k) := Fintype.decidableExistsFintype
 
-#eval is_k_colorable G_ex 10
-#eval is_k_colorable2 G_ex_2 10
+theorem is_k_colorable_eq (G: Graph) (k: Nat) : is_k_colorable G k = is_k_colorable2 (convertGraphToGraph2 G) k := by
+  unfold is_k_colorable is_k_colorable2
+  apply Iff.to_eq
+  constructor
+  · rintro ⟨coloring, h⟩
+    use coloring
+    exact (colorings_convert G coloring).mp h
+  · rintro ⟨coloring2, h⟩
+    use coloring2
+    exact (colorings_convert G coloring2).mpr h
+theorem is_k_colorable_eq2 (G: Graph) : is_k_colorable G = is_k_colorable2 (convertGraphToGraph2 G) := by
+  ext k
+  unfold is_k_colorable is_k_colorable2
+  constructor
+  · rintro ⟨coloring, h⟩
+    use coloring
+    exact (colorings_convert G coloring).mp h
+  · rintro ⟨coloring2, h⟩
+    use coloring2
+    exact (colorings_convert G coloring2).mpr h
+-- #eval is_k_colorable G_ex 10
+-- #eval is_k_colorable2 G_ex_2 10
 
-def chromatic_number (G : Graph): ℕ :=
+def chromatic_number (G: Graph): ℕ :=
   @Nat.find (is_k_colorable G) _ (by {
     unfold is_k_colorable valid_coloring GraphConnected
     use G.vertexSize, λ i=>i
@@ -39,7 +59,7 @@ def chromatic_number (G : Graph): ℕ :=
     exact (G.irreflexive a) hab
   })
 
-def chromatic_number2 (G2:Graph2) : ℕ :=
+def chromatic_number2 (G2: Graph2) : ℕ :=
   @Nat.find (is_k_colorable2 G2) _ (by {
     unfold is_k_colorable2 valid_coloring2 Graph2Connected
     use G2.vertexSize, λ i=>i
@@ -51,6 +71,42 @@ def chromatic_number2 (G2:Graph2) : ℕ :=
     apply q
     exact Array.contains_def.mp hab
   })
+
+theorem chromatic_colorable (G2: Graph2): is_k_colorable2 G2 (chromatic_number2 G2) := by
+  unfold chromatic_number2
+  -- Maybe refactor this?
+  exact @Nat.find_spec (is_k_colorable2 G2) _ (by {
+    unfold is_k_colorable2 valid_coloring2 Graph2Connected
+    use G2.vertexSize, λ i=>i
+    intro a b hab
+    by_contra h
+    simp [← h] at hab
+    have q:= G2.edgeIrreflexive a
+    simp at q
+    apply q
+    exact Array.contains_def.mp hab
+  })
+
+theorem chromatic_number_eq (G: Graph) : chromatic_number G = chromatic_number2 (convertGraphToGraph2 G) := by
+  unfold chromatic_number
+  have q:= @Nat.find_eq_iff (chromatic_number2 (convertGraphToGraph2 G)) (is_k_colorable G) _ (by {
+    unfold is_k_colorable valid_coloring GraphConnected
+    use G.vertexSize, λ i=>i
+    intro a b hab
+    by_contra h
+    simp [← h] at hab
+    exact (G.irreflexive a) hab
+  })
+  simp [q]
+  clear q
+  constructor
+  · rw [is_k_colorable_eq2]
+    exact chromatic_colorable (convertGraphToGraph2 G)
+  · intro n hn h2
+    rw [is_k_colorable_eq2] at h2
+    unfold chromatic_number2 at hn
+    have q:= Nat.find_min (Exists.intro n h2) hn
+    exact q h2
 
 -- #eval chromatic_number G_ex
 -- #eval chromatic_number2 G_ex_2
