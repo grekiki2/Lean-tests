@@ -3,7 +3,7 @@ import Graph.Coloring
 import Lt.Sorted
 
 -- K_n
-def G_ex: Graph := {vertexSize:=7, connected:=(λ x y=>x ≠ y), connected_decidable := by simp; intro a b;apply Not.decidable, irreflexive := by simp, symmetric:= by apply Ne.symm }
+def G_ex: Graph := {vertexSize:=4, connected:=(λ x y=>x ≠ y), connected_decidable := by simp; intro a b;apply Not.decidable, irreflexive := by simp, symmetric:= by apply Ne.symm }
 def G_ex_2 := convertGraphToGraph2 G_ex
 #eval Fintype.card (Coloring G_ex 3)
 #eval Fintype.card (Coloring2 G_ex_2 3)
@@ -145,3 +145,58 @@ theorem bounds_give_chromatic (G:Graph) (k: Nat) : ¬ is_k_colorable G k → is_
   rcases h2 with ⟨coloring, h3⟩
   have ub := coloring_gives_ub G (k+1) coloring h3
   linarith
+
+
+-- Bolj učinkovita implementacija
+
+def col (G:Graph) (colors:Nat) (h:colors≠0) (idx:Fin G.vertexSize) (cur_col:Fin colors) (coloring: Array (Fin colors)) (len: coloring.size = G.vertexSize): Option (Array (Fin colors)) :=
+  --  dbg_trace "Called {idx} {cur_col} {coloring}"
+
+  -- Check if coloring current vertex with current color is valid
+  let valid := ∀ (i:Fin G.vertexSize), i<idx -- Only check already colored vertices
+     → G.connected idx i → cur_col ≠ coloring[i]'(by {rw [len]; exact Fin.prop i})
+
+  if ¬valid then
+    if b:cur_col.val+1 < colors
+      then
+        let _:colors - (cur_col.val + 1) < colors - cur_col.val := by {
+          apply Nat.sub_lt_sub_left
+          exact Fin.prop cur_col
+          exact Nat.lt.base ↑cur_col
+        }
+        col G colors h idx ⟨cur_col.val+1, b⟩ coloring len
+    else none
+  else
+    if b:idx.val+1 >= G.vertexSize then some (coloring.set ⟨idx.val, by {rw [len]; exact Fin.prop idx}⟩ cur_col)
+    else -- Current color is locally good, let's see if recursion succeds
+      let _: G.vertexSize - (↑idx + 1) < G.vertexSize - ↑idx := by {
+        apply Nat.sub_lt_sub_left
+        exact Fin.prop idx
+        exact Nat.lt.base ↑idx
+      }
+      let ret := col G colors h ⟨idx.val+1, by {simp at b; assumption}⟩ ⟨0, Fin.pos cur_col⟩ (coloring.set ⟨idx.val, by {rw [len]; linarith}⟩ cur_col) (by simp [len])
+      match ret with
+      | some _ => ret
+      | none =>
+        if b:cur_col.val+1 >= colors then none else -- We can't seem to color this vertex with any color given coloring prefix
+        let _:colors - (↑cur_col + 1) < colors - ↑cur_col := by {
+          apply Nat.sub_lt_sub_left
+          exact Fin.prop cur_col
+          exact Nat.lt.base ↑cur_col
+        }
+        col G colors h idx ⟨cur_col.val+1, Nat.not_le.mp b⟩ coloring len
+  -- Proof of termination
+  termination_by col G colors h idx cur_col coloring len => (G.vertexSize -idx.val, colors-cur_col.val)
+
+def is_k_colorable_v2 (G: Graph) (k:Nat): Bool :=
+  if h1:G.vertexSize = 0 then k = 0 else
+  if h2:k=0 then false else
+  -- k, G.vertexSize > 0
+  let coloring :=Array.mkArray (G.vertexSize) ⟨0, Nat.pos_of_ne_zero h2⟩
+  let idea := col G k h2 ⟨0, Nat.pos_of_ne_zero h1⟩ ⟨0, Nat.pos_of_ne_zero h2⟩ (coloring) (by simp)
+  match idea with
+  | none => false
+  | some _ => dbg_trace "msg with {idea}"; true
+
+#eval is_k_colorable G_ex 3
+#eval is_k_colorable_v2 G_ex 3
