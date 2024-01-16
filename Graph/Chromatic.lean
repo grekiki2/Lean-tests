@@ -1,6 +1,9 @@
 import Graph.Graph
 import Graph.Coloring
+import Graph.Even
+import Mathlib
 import Mathlib.Init.Function
+
 
 -- K_n
 def G_ex: Graph := K_n 4
@@ -114,3 +117,265 @@ theorem injective_le_chromatic (G G2:Graph) (f:Fin G2.vertexSize → Fin G.verte
 
   unfold is_k_colorable
   use coloringG2
+
+theorem chromatic_number_of_C_n_even (n:Nat) (h:2*n≥2): chromatic_number (C_n (2*n) h) = 2 := by
+  apply (bounds_give_chromatic _ _).mp
+  constructor
+  · unfold is_k_colorable
+    intro ⟨coloring, valid_coloring⟩
+    unfold valid_coloring at valid_coloring
+    have size: (C_n (2*n) h).vertexSize=2*n := by simp [C_n]
+    specialize valid_coloring ⟨0, by linarith⟩ ⟨1, by linarith⟩
+    simp [GraphConnected, C_n] at valid_coloring
+    apply valid_coloring
+    have q2: ∀ x, coloring x = 0:= by {
+      intro x
+      exact Fin.eq_zero (coloring x)
+    }
+    simp [q2]
+  · unfold is_k_colorable
+    use λ i => ⟨i%2, by {
+      refine Nat.mod_lt ↑i ?_
+      trivial
+    }⟩
+    unfold valid_coloring
+    intro a b
+    simp [GraphConnected, C_n]
+    intro hab
+    unfold C_n at a b
+    simp at a b
+    -- Do tukaj je dokaz ok. Potem postane siten
+    rcases hab with ((h' | h') | ⟨hl, hr⟩ )| ⟨hl, hr⟩
+    · rw [h']
+      exact (succ_ne_mod b).symm
+    · rw [h']
+      exact (succ_ne_mod a)
+    · rw [hl]
+      simp
+      have q: (b+1)%2=(2*n)%2 := congrFun (congrArg HMod.hMod hr) 2
+      simp at q
+      have q2:= succ_ne_mod b
+      intro h
+      rw [← h, q] at q2
+      trivial
+    · rw [hl]
+      simp
+      have q: (a+1)%2=(2*n)%2 := congrFun (congrArg HMod.hMod hr) 2
+      simp at q
+      have q2:= succ_ne_mod a
+      rw [q] at q2
+      simp at q2
+      trivial
+
+#check Fin.ext_iff
+#check congrArg
+theorem chromatic_number_of_C_n_odd (n:Nat) (h:2*n+1≥2): chromatic_number (C_n (2*n+1) h) = 3 := by
+  apply (bounds_give_chromatic _ _).mp
+  constructor
+  · unfold is_k_colorable
+    intro ⟨col, valid_col⟩
+    simp [Coloring, C_n] at col
+    unfold valid_coloring GraphConnected at valid_col
+    simp [C_n] at valid_col
+    have color_prop:∀ idx: Nat, idx<2*n+1 → (idx%2=1 → col idx ≠ col 0) ∧ (idx%2=0 → col idx = col 0) := by {
+      -- intro idx
+      -- induction idx with
+      -- | zero => simp
+      -- | succ idxl ih => {
+      --   intro h
+      --   have q:idxl<2*n+1 := by linarith
+      --   specialize ih q
+      --   simp at ih ⊢
+      --   match mod:idxl%2 with
+      --   | 0 => {
+      --     simp [mod] at ih
+      --     have mod_succ:Nat.succ idxl % 2 = 1:= by {
+      --       rw [←Nat.add_one]
+      --       have q3:= succ_ne_mod idxl
+      --       rw [mod] at q3
+      --       simp at q3
+      --       exact Nat.succ_mod_two_eq_one_iff.mpr mod
+      --     }
+      --     simp [mod_succ]
+      --     rw [← ih]
+      --     specialize valid_col ⟨↑idxl+1, by linarith⟩ ⟨↑idxl, by linarith⟩
+      --     simp at valid_col
+      --     intro hh
+      --     apply valid_col
+      --     have q3:col { val := idxl + 1, isLt := by linarith } = col (↑idxl+1) := by {
+      --       congr
+      --       rw [← Nat.add_one] at h
+      --       simp [h]
+      --       exact (Nat.mod_eq_of_lt h).symm
+      --     }
+      --     rw [q3]
+      --     have q4:col { val := idxl, isLt := by linarith } = col (↑idxl) := by {
+      --       congr
+      --       exact (Nat.mod_eq_of_lt q).symm
+      --     }
+      --     rw [q4]
+      --     assumption
+      --   }
+      --   | 1 => {
+      --     simp [mod] at ih
+      --     have mod_succ:Nat.succ idxl % 2 = 0:= by {
+      --       rw [←Nat.add_one]
+      --       have q3:= succ_ne_mod idxl
+      --       rw [mod] at q3
+      --       simp at q3
+      --       exact Nat.succ_mod_two_eq_zero_iff.mpr mod
+      --     }
+      --     simp [mod_succ]
+      --     specialize valid_col ⟨↑idxl+1, by linarith⟩ ⟨↑idxl, by linarith⟩
+      --     simp at valid_col
+      --     clear mod_succ mod
+      --     have q3:col { val := idxl + 1, isLt := by linarith } = col (↑idxl+1) := by {
+      --       congr
+      --       rw [← Nat.add_one] at h
+      --       simp [h]
+      --       exact (Nat.mod_eq_of_lt h).symm
+      --     }
+      --     have q4:col { val := idxl, isLt := by linarith } = col (↑idxl) := by {
+      --       congr
+      --       exact (Nat.mod_eq_of_lt q).symm
+      --     }
+      --     rw [q3, q4] at valid_col
+      --     match h:col ⟨0, by linarith⟩ with
+      --     | ⟨0, _⟩ => {
+      --       simp at h
+      --       rw [h] at ih
+      --       simp
+      --       match h2:col ⟨idxl, by linarith⟩ with
+      --       | ⟨0, _⟩ => {
+      --         simp at h2
+      --         rw [q4] at h2
+      --         exfalso
+      --         exact ih h2
+      --       }
+      --       | ⟨1, _⟩ => {
+      --         simp at h2
+      --         rw [q4] at h2
+      --         rw [h2] at valid_col
+      --         match h3:col ⟨idxl+1, by linarith⟩ with
+      --         | ⟨0, _⟩ => {
+      --           simp at h3
+      --           rw [q3] at h3
+      --           assumption
+      --         }
+      --         | ⟨1, _⟩ => {
+      --           simp at h3
+      --           rw [q3] at h3
+      --           exfalso
+      --           exact valid_col h3
+      --         }
+      --       }
+      --     }
+      --     | ⟨1, _⟩ => {
+      --       simp at h ⊢
+      --       rw [h] at ih
+      --       match h2:col ⟨idxl, by linarith⟩ with
+      --       | ⟨0, _⟩ => {
+      --         simp at h2
+      --         rw [q4] at h2
+      --         rw [h2] at valid_col
+      --         match h3:col ⟨idxl+1, by linarith⟩ with
+      --         | ⟨0, _⟩ => {
+      --           simp at h3
+      --           rw [q3] at h3
+      --           exfalso
+      --           exact valid_col h3
+      --         }
+      --         | ⟨1, _⟩ => {
+      --           simp at h3
+      --           rw [q3] at h3
+      --           assumption
+      --         }
+      --       }
+      --       | ⟨1, _⟩ => {
+      --         simp at h2
+      --         rw [q4] at h2
+      --         rw [h2] at valid_col
+      --         match h3:col ⟨idxl+1, by linarith⟩ with
+      --         | ⟨0, _⟩ => {
+      --           simp at h3
+      --           rw [q3] at h3
+      --           rw [h3]
+      --           trivial
+      --         }
+      --         | ⟨1, _⟩ => {
+      --           simp at h3
+      --           rw [q3] at h3
+      --           assumption
+      --         }
+      --       }
+      --     }
+      --   }
+      --   | n+2 => { --Impossible
+      --     exfalso
+      --     rw [← Nat.add_one, Nat.add_assoc] at mod
+      --     have q2:= @Nat.mod_lt idxl 2 (by linarith)
+      --     rw [mod] at q2
+      --     linarith
+      --   }
+      -- }
+      sorry
+    }
+    specialize color_prop (2*n) (by linarith)
+    simp at color_prop
+    specialize valid_col ⟨0, by linarith⟩ ⟨2*n, by linarith⟩
+    simp at valid_col
+    apply valid_col
+    rw [← color_prop]
+    apply congrArg
+    sorry
+  · unfold is_k_colorable
+    use λ i => (if i.val=0 then 2 else ⟨i%2, by {
+      refine Nat.lt_add_right 1 ?_
+      refine Nat.mod_lt ↑i ?_
+      trivial
+    }⟩)
+    unfold valid_coloring C_n GraphConnected
+    simp
+    intro a b hab
+    by_cases aeq0: a.val=0
+    · simp [aeq0]
+      rcases hab with ((h' | h') | ⟨hl, hr⟩ )| ⟨hl, hr⟩
+      · exfalso
+        rw [aeq0, Nat.add_one] at h'
+        exact Nat.succ_ne_zero (↑b) h'.symm
+      · simp [aeq0] at h'
+        simp [h']
+        trivial
+      · have q:b.val≠0 := by linarith
+        simp [q]
+        intro h
+        have q2:(2:Nat)=↑b % 2 := by {
+          have q3:= Fin.ext_iff.mp h
+          rw [hr] at q3
+          simp at q3
+        }
+        have q4:=@Nat.mod_lt b 2
+        simp at q4
+        linarith
+      · simp [hl]
+        linarith
+    · simp [aeq0]
+      by_cases beq0: b.val=0
+      · simp [beq0]
+        intro h
+        have q4:=@Nat.mod_lt a 2
+        simp at q4
+        have q3:= Fin.ext_iff.mp h
+        simp at q3
+        linarith
+      · simp [aeq0, beq0]
+        rcases hab with ((h' | h') | ⟨hl, hr⟩ )| ⟨hl, hr⟩
+        · rw [h']
+          exact (succ_ne_mod b).symm
+        · rw [h']
+          exact (succ_ne_mod a)
+        · rw [hl, hr]
+          simp
+          exact aeq0 hl
+        · exfalso
+          exact beq0 hl
