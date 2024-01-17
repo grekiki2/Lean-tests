@@ -169,6 +169,8 @@ theorem chromatic_number_of_C_n_even (n:Nat) (h:2*n≥2): chromatic_number (C_n 
 
 #check Fin.ext_iff
 #check congrArg
+#check Fin.val_cast_of_lt
+
 theorem chromatic_number_of_C_n_odd (n:Nat) (h:2*n+1≥2): chromatic_number (C_n (2*n+1) h) = 3 := by
   apply (bounds_give_chromatic _ _).mp
   constructor
@@ -178,147 +180,146 @@ theorem chromatic_number_of_C_n_odd (n:Nat) (h:2*n+1≥2): chromatic_number (C_n
     unfold valid_coloring GraphConnected at valid_col
     simp [C_n] at valid_col
     have color_prop:∀ idx: Nat, idx<2*n+1 → (idx%2=1 → col idx ≠ col 0) ∧ (idx%2=0 → col idx = col 0) := by {
-      -- intro idx
-      -- induction idx with
-      -- | zero => simp
-      -- | succ idxl ih => {
-      --   intro h
-      --   have q:idxl<2*n+1 := by linarith
-      --   specialize ih q
-      --   simp at ih ⊢
-      --   match mod:idxl%2 with
-      --   | 0 => {
-      --     simp [mod] at ih
-      --     have mod_succ:Nat.succ idxl % 2 = 1:= by {
-      --       rw [←Nat.add_one]
-      --       have q3:= succ_ne_mod idxl
-      --       rw [mod] at q3
-      --       simp at q3
-      --       exact Nat.succ_mod_two_eq_one_iff.mpr mod
-      --     }
-      --     simp [mod_succ]
-      --     rw [← ih]
-      --     specialize valid_col ⟨↑idxl+1, by linarith⟩ ⟨↑idxl, by linarith⟩
-      --     simp at valid_col
-      --     intro hh
-      --     apply valid_col
-      --     have q3:col { val := idxl + 1, isLt := by linarith } = col (↑idxl+1) := by {
-      --       congr
-      --       rw [← Nat.add_one] at h
-      --       simp [h]
-      --       exact (Nat.mod_eq_of_lt h).symm
-      --     }
-      --     rw [q3]
-      --     have q4:col { val := idxl, isLt := by linarith } = col (↑idxl) := by {
-      --       congr
-      --       exact (Nat.mod_eq_of_lt q).symm
-      --     }
-      --     rw [q4]
-      --     assumption
-      --   }
-      --   | 1 => {
-      --     simp [mod] at ih
-      --     have mod_succ:Nat.succ idxl % 2 = 0:= by {
-      --       rw [←Nat.add_one]
-      --       have q3:= succ_ne_mod idxl
-      --       rw [mod] at q3
-      --       simp at q3
-      --       exact Nat.succ_mod_two_eq_zero_iff.mpr mod
-      --     }
-      --     simp [mod_succ]
-      --     specialize valid_col ⟨↑idxl+1, by linarith⟩ ⟨↑idxl, by linarith⟩
-      --     simp at valid_col
-      --     clear mod_succ mod
-      --     have q3:col { val := idxl + 1, isLt := by linarith } = col (↑idxl+1) := by {
-      --       congr
-      --       rw [← Nat.add_one] at h
-      --       simp [h]
-      --       exact (Nat.mod_eq_of_lt h).symm
-      --     }
-      --     have q4:col { val := idxl, isLt := by linarith } = col (↑idxl) := by {
-      --       congr
-      --       exact (Nat.mod_eq_of_lt q).symm
-      --     }
-      --     rw [q3, q4] at valid_col
-      --     match h:col ⟨0, by linarith⟩ with
-      --     | ⟨0, _⟩ => {
-      --       simp at h
-      --       rw [h] at ih
-      --       simp
-      --       match h2:col ⟨idxl, by linarith⟩ with
-      --       | ⟨0, _⟩ => {
-      --         simp at h2
-      --         rw [q4] at h2
-      --         exfalso
-      --         exact ih h2
-      --       }
-      --       | ⟨1, _⟩ => {
-      --         simp at h2
-      --         rw [q4] at h2
-      --         rw [h2] at valid_col
-      --         match h3:col ⟨idxl+1, by linarith⟩ with
-      --         | ⟨0, _⟩ => {
-      --           simp at h3
-      --           rw [q3] at h3
-      --           assumption
-      --         }
-      --         | ⟨1, _⟩ => {
-      --           simp at h3
-      --           rw [q3] at h3
-      --           exfalso
-      --           exact valid_col h3
-      --         }
-      --       }
-      --     }
-      --     | ⟨1, _⟩ => {
-      --       simp at h ⊢
-      --       rw [h] at ih
-      --       match h2:col ⟨idxl, by linarith⟩ with
-      --       | ⟨0, _⟩ => {
-      --         simp at h2
-      --         rw [q4] at h2
-      --         rw [h2] at valid_col
-      --         match h3:col ⟨idxl+1, by linarith⟩ with
-      --         | ⟨0, _⟩ => {
-      --           simp at h3
-      --           rw [q3] at h3
-      --           exfalso
-      --           exact valid_col h3
-      --         }
-      --         | ⟨1, _⟩ => {
-      --           simp at h3
-      --           rw [q3] at h3
-      --           assumption
-      --         }
-      --       }
-      --       | ⟨1, _⟩ => {
-      --         simp at h2
-      --         rw [q4] at h2
-      --         rw [h2] at valid_col
-      --         match h3:col ⟨idxl+1, by linarith⟩ with
-      --         | ⟨0, _⟩ => {
-      --           simp at h3
-      --           rw [q3] at h3
-      --           rw [h3]
-      --           trivial
-      --         }
-      --         | ⟨1, _⟩ => {
-      --           simp at h3
-      --           rw [q3] at h3
-      --           assumption
-      --         }
-      --       }
-      --     }
-      --   }
-      --   | n+2 => { --Impossible
-      --     exfalso
-      --     rw [← Nat.add_one, Nat.add_assoc] at mod
-      --     have q2:= @Nat.mod_lt idxl 2 (by linarith)
-      --     rw [mod] at q2
-      --     linarith
-      --   }
-      -- }
-      sorry
+      intro idx
+      induction idx with
+      | zero => simp
+      | succ idxl ih => {
+        intro h
+        have q:idxl<2*n+1 := by linarith
+        specialize ih q
+        simp at ih ⊢
+        match mod:idxl%2 with
+        | 0 => {
+          simp [mod] at ih
+          have mod_succ:Nat.succ idxl % 2 = 1:= by {
+            rw [←Nat.add_one]
+            have q3:= succ_ne_mod idxl
+            rw [mod] at q3
+            simp at q3
+            exact Nat.succ_mod_two_eq_one_iff.mpr mod
+          }
+          simp [mod_succ]
+          rw [← ih]
+          specialize valid_col ⟨↑idxl+1, by linarith⟩ ⟨↑idxl, by linarith⟩
+          simp at valid_col
+          intro hh
+          apply valid_col
+          have q3:col { val := idxl + 1, isLt := by linarith } = col (↑idxl+1) := by {
+            congr
+            rw [← Nat.add_one] at h
+            simp [h]
+            exact (Nat.mod_eq_of_lt h).symm
+          }
+          rw [q3]
+          have q4:col { val := idxl, isLt := by linarith } = col (↑idxl) := by {
+            congr
+            exact (Nat.mod_eq_of_lt q).symm
+          }
+          rw [q4]
+          assumption
+        }
+        | 1 => {
+          simp [mod] at ih
+          have mod_succ:Nat.succ idxl % 2 = 0:= by {
+            rw [←Nat.add_one]
+            have q3:= succ_ne_mod idxl
+            rw [mod] at q3
+            simp at q3
+            exact Nat.succ_mod_two_eq_zero_iff.mpr mod
+          }
+          simp [mod_succ]
+          specialize valid_col ⟨↑idxl+1, by linarith⟩ ⟨↑idxl, by linarith⟩
+          simp at valid_col
+          clear mod_succ mod
+          have q3:col { val := idxl + 1, isLt := by linarith } = col (↑idxl+1) := by {
+            congr
+            rw [← Nat.add_one] at h
+            simp [h]
+            exact (Nat.mod_eq_of_lt h).symm
+          }
+          have q4:col { val := idxl, isLt := by linarith } = col (↑idxl) := by {
+            congr
+            exact (Nat.mod_eq_of_lt q).symm
+          }
+          rw [q3, q4] at valid_col
+          match h:col ⟨0, by linarith⟩ with
+          | ⟨0, _⟩ => {
+            simp at h
+            rw [h] at ih
+            simp
+            match h2:col ⟨idxl, by linarith⟩ with
+            | ⟨0, _⟩ => {
+              simp at h2
+              rw [q4] at h2
+              exfalso
+              exact ih h2
+            }
+            | ⟨1, _⟩ => {
+              simp at h2
+              rw [q4] at h2
+              rw [h2] at valid_col
+              match h3:col ⟨idxl+1, by linarith⟩ with
+              | ⟨0, _⟩ => {
+                simp at h3
+                rw [q3] at h3
+                assumption
+              }
+              | ⟨1, _⟩ => {
+                simp at h3
+                rw [q3] at h3
+                exfalso
+                exact valid_col h3
+              }
+            }
+          }
+          | ⟨1, _⟩ => {
+            simp at h ⊢
+            rw [h] at ih
+            match h2:col ⟨idxl, by linarith⟩ with
+            | ⟨0, _⟩ => {
+              simp at h2
+              rw [q4] at h2
+              rw [h2] at valid_col
+              match h3:col ⟨idxl+1, by linarith⟩ with
+              | ⟨0, _⟩ => {
+                simp at h3
+                rw [q3] at h3
+                exfalso
+                exact valid_col h3
+              }
+              | ⟨1, _⟩ => {
+                simp at h3
+                rw [q3] at h3
+                assumption
+              }
+            }
+            | ⟨1, _⟩ => {
+              simp at h2
+              rw [q4] at h2
+              rw [h2] at valid_col
+              match h3:col ⟨idxl+1, by linarith⟩ with
+              | ⟨0, _⟩ => {
+                simp at h3
+                rw [q3] at h3
+                rw [h3]
+                trivial
+              }
+              | ⟨1, _⟩ => {
+                simp at h3
+                rw [q3] at h3
+                assumption
+              }
+            }
+          }
+        }
+        | n+2 => { --Impossible
+          exfalso
+          rw [← Nat.add_one, Nat.add_assoc] at mod
+          have q2:= @Nat.mod_lt idxl 2 (by linarith)
+          rw [mod] at q2
+          linarith
+        }
+      }
     }
     specialize color_prop (2*n) (by linarith)
     simp at color_prop
@@ -327,7 +328,26 @@ theorem chromatic_number_of_C_n_odd (n:Nat) (h:2*n+1≥2): chromatic_number (C_n
     apply valid_col
     rw [← color_prop]
     apply congrArg
-    sorry
+    apply Fin.ext_iff.mpr
+    simp
+    rw [Fin.val_mul]
+    simp
+    have q:n %(2 * n + 1)=n := by {
+      have q2: n<2*n+1 := by linarith
+      exact Nat.mod_eq_of_lt q2
+    }
+    rw [q]
+    have q:@Fin.val (2 * n + 1) 2 = 2 := by {
+      have hh: 2*n+1>2 := by {
+        match n with
+        | 0 => linarith
+        | n'+1 => linarith
+      }
+      apply Fin.val_cast_of_lt
+      assumption
+    }
+    rw [q]
+    simp
   · unfold is_k_colorable
     use λ i => (if i.val=0 then 2 else ⟨i%2, by {
       refine Nat.lt_add_right 1 ?_
