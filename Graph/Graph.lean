@@ -29,14 +29,7 @@ def C_n (k:Nat) (h:k≥2): Graph :=
   }, symmetric:= by {
     intro a b
     simp
-    intro h2
-    rcases h2 with h2|h2
-    · rcases h2 with h2|h2
-      · rcases h2 with h2|h2
-        · left; left; right; assumption
-        · left; left; left; assumption
-      · right; assumption
-    · left; right; assumption
+    tauto
   }}
 
 def getEdgeListForNode (G:Graph) (i:Fin G.vertexSize) : Array (Fin G.vertexSize) :=
