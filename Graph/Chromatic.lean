@@ -92,7 +92,7 @@ theorem bounds_give_chromatic (G:Graph) (k: Nat) : ¬is_k_colorable G k ∧ is_k
 
 -- #eval chromatic_number (C_n 13 (by linarith))
 
-theorem injective_le_chromatic (G G2:Graph) (f:Fin G2.vertexSize → Fin G.vertexSize) (f_inj:Function.Injective f) (f_inherits: ∀ a b, G2.connected a b → G.connected (f a) (f b)): chromatic_number G2 ≤ chromatic_number G := by
+theorem sub_le_chromatic (G G2:Graph) (f:Fin G2.vertexSize → Fin G.vertexSize) (f_inherits: ∀ a b, G2.connected a b → G.connected (f a) (f b)): chromatic_number G2 ≤ chromatic_number G := by
   apply (colorable_gives_ub _ _).mp
   have hG : is_k_colorable G (chromatic_number G) := by {
     apply (colorable_gives_ub G (chromatic_number G)).mpr
@@ -117,6 +117,9 @@ theorem injective_le_chromatic (G G2:Graph) (f:Fin G2.vertexSize → Fin G.verte
 
   unfold is_k_colorable
   use coloringG2
+
+theorem injective_le_chromatic (G G2:Graph) (f:Fin G2.vertexSize → Fin G.vertexSize) (f_inj:Function.Injective f) (f_inherits: ∀ a b, G2.connected a b → G.connected (f a) (f b)): chromatic_number G2 ≤ chromatic_number G := by
+  exact sub_le_chromatic G G2 f f_inherits
 
 theorem chromatic_number_of_C_n_even (n:Nat) (h:2*n≥2): chromatic_number (C_n (2*n) h) = 2 := by
   apply (bounds_give_chromatic _ _).mp
