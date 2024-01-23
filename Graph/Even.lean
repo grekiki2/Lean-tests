@@ -11,3 +11,9 @@ theorem succ_ne_mod (n:Nat): n%2 ≠ (n+1)%2 := by
     simp at h
     exact id h.symm
   }
+
+structure Tocka :=
+    x: Nat
+    y: Nat
+
+def izhodisce : Tocka := {x := 0, y := 0}

@@ -1,0 +1,258 @@
+% \documentclass[mat1, tisk]{fmfdelo}
+\documentclass[mat1]{fmfdelo}
+
+\avtor{Gregor Kikelj}
+\naslov{Preverjanje kromatskega števila grafov z dokazovalnim pomočnikom Lean}
+\title{Verification of chromatic number of a graph with Lean proof assistant}
+\mentor{prof. dr. Andrej Bauer}
+\letnica{2024}
+
+% - povzetek v slovenščini
+%   V povzetku na kratko opišite vsebinske rezultate dela. Sem ne sodi razlaga
+%   organizacije dela, torej v katerem razdelku je kaj, pač pa le opis vsebine.
+\povzetek{TODO}
+
+% - povzetek v angleščini
+\abstract{TODO}
+
+% - klasifikacijske oznake, ločene z vejicami https://www.ams.org/msc/
+\klasifikacija{..., ...}
+\kljucnebesede{...\sep ...}
+\keywords{...\sep ...}
+
+\slovar{
+\geslo{Chromatic number}{Kromatsko število}
+}
+
+% - ime datoteke z viri (vključno s končnico .bib), če uporabljate BibTeX
+% \literatura{....bib}
+
+
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{keywordcolor}{rgb}{0.7, 0.1, 0.1}   % red
+\definecolor{tacticcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{commentcolor}{rgb}{0.4, 0.4, 0.4}   % grey
+\definecolor{symbolcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{sortcolor}{rgb}{0.1, 0.5, 0.1}      % green
+\definecolor{attributecolor}{rgb}{0.7, 0.1, 0.1} % red
+
+\def\lstlanguagefiles{lstlean.tex}
+\lstset{language=lean}
+
+
+
+
+
+
+\begin{document}
+\section{Uvod}
+Raziskovanje kromatskega števila grafov predstavlja pomemben problem teorije grafov.
+Kromatsko število grafa nam pove najmnaj koliko barv potrebujemo za barvanje vozlišč grafa, tako da dve sosednji vozlišči nista enake barve.
+Ta problem ni zanimiv le matematično, ampak ima uporabe tudi pri drugih področjih, predvsem v povezavi z računalništvom. 
+Iskanje kromatskega števila je sicer računsko težek problem v smislu, da ne poznamo algoritma, ki bi ga računal v polinomskem času v odvisnosti od števila vozlišč grafa.
+
+V tej diplomski nalogi se osredotočimo na iskanje kromatskega šteila skupaj z dokazom da smo res našli pravo vrednost.
+Da to dosežemo si bomo pomagali z dokazovalnikom Lean.
+V prvem delu naloge natančno definiramo pojme iz teorije grafov ki jih potrebujemo za dokazovanje. Nato na kratko opišemo osnove uporabe dokazovalnika
+Lean ter matematične definicije konstruiramo znotraj Leana. 
+Na koncu definiramo nekaj algoritmov za iskanje kromatskega števila in dokažemo njihovo pravilnost. 
+
+\section{Osnovne definicije}
+
+\begin{definicija}
+    Graf je urejen par $G=(V, E)$ kjer je 
+    \begin{itemize}
+      \item $V\neq \emptyset$ končna množica vozlišč,
+      \item $E$ množica povezav, kjer je vsaka povezava množica dveh različnih vozlišč iz $V$. 
+    \end{itemize}
+\end{definicija}
+Če sta različni vozlišči $u, v$ elementa neke povezave iz $E$ to pišemo kot $u\sim v$ ter pravimo, da sta sosednji vozlišči in da sta krajišči povezave $uv\in E$.
+
+\begin{definicija}
+    Naj bo $v\in V$. Stopnja vozlišča $v$ je število elementov $E$ ki vsebujejo $v$, oziroma z besedami število povezav, ki vsebujejo $v$. 
+\end{definicija}
+
+\begin{itemize}
+    \item Največjo stopnjo v grafu označimo z \[\Delta (G) = \max_{v\in V} deg(v)\]
+    \item Najmanjšo stopnjo v grafu označimo z \[\delta (G) = \min_{v\in V} deg(v)\]
+\end{itemize}
+
+\begin{definicija}
+    Definiramo oznako $[k] = \{1, 2, \dots, k-1\}$ za množico naravnih števil manjših od $k$.
+\end{definicija}
+
+\begin{definicija}
+    Naj bo $G$ graf in $k\in \mathbb{N}$. Preslikava $f:V(G)\to [k]$ je $k$ barvanje grafa $G$ če za vse $u, v\in V$ velja $u\sim v \implies f(u)\neq f(v)$.
+\end{definicija}
+Z besedami: barvanje grafa s $k$ barvami je preslikava, ki vsakemu vozlišču priredi eno izmed $k$ barv, tako da sta sosednji vozlišči vedno pobarvani z različnima barvama.
+
+\begin{definicija}
+    Kromatsko število grafa $G$ ki ga označimo kot $\chi(G)$, je najmanjše število, da obstaja $\chi(G)$ barvanje grafa $G$.
+\end{definicija}
+\begin{lema}
+    Naj bo $G$ graf. Potem kromatsko število grafa $G$ obstaja.
+\end{lema}
+\begin{dokaz}
+    Dovolj je da dokažemo da obstaja neko število $k$ za katerega obstaja $k$ barvanje grafa $G$.
+    Dokažimo da je $k=|V|$ dovolj, kjer je $V$ množica vozlišč grafa $G$. Ker je $V$ končna množica
+    lahko vozlišča oštevilčimo kot $V = \{v_0, v_1, \dots, v_{k-1}\}$. Poglejmo si barvanje 
+    \[ f:V \to [k], f(v_i) = i\]
+    Dokazati moramo $\forall v_i, v_j \in V, v_i \sim v_j\implies f(v_i)\neq f(v_j)$. Po definiciji $f$ je dovolj dokazati
+    $\forall v_i, v_j \in V, v_i \sim v_j\implies i\neq j$ to pa je res ker sta si povezani vozlišči vedno različni po definiciji množice
+    povezav grafa.
+\end{dokaz}
+
+\begin{definicija}
+Naj bosta $G$ in $H$ grafa. Pravimo da je $H$ podgraf $G$ če je $V(H)\subset V(G)$ in $E(H)\subset E(G)$.
+\end{definicija}
+\begin{lema}
+    Naj bo $G$ graf in $H$ njegov podgraf. Potem velja $\chi(H)\leq \chi(G)$.
+\end{lema}
+\begin{proof}
+    Očitno.
+\end{proof}
+
+\section{Lean}
+Lean je interaktivni dokazovalnik. Uporabljali bomo verzijo Lean 4 ki je razvita pri Microsoftu in temelji na teoriji tipov
+s čimer se ne bomo ukvarjali preveč ker je tema te diplomske naloge teorija grafov. Lean 4 lahko in ga bomo uporabljali tudi
+kot funkcijski programski jezik. 
+
+\subsection{Računanje izrazov}
+Kot ostali običajni programski jeziki tudi Lean podpira računanje osnovnih aritmetičnih izrazov.
+\begin{lstlisting}
+#eval 1 + 1
+\end{lstlisting}
+Lean nam v informacijskem oknu pove da se izraz evaluira v 2. Lean upošteva tudi vrstni red operacij na primer
+\begin{lstlisting}
+#eval 1 + 2 * 3
+\end{lstlisting}
+se izračuna v 7. Če želimo uporabiti drugačen vrstni red operacij lahko to naredimo z oklepaji
+\begin{lstlisting}
+#eval (1 + 2) * 3
+\end{lstlisting}
+ki se izračuna v 9.
+\subsection{Tipi}
+Tipe poznamo iz drugih programskih jezikov (npr. Python, Java) so pa v Leanu bolj pomembni in imajo nekaj več funkcionalnosti.
+
+Osnovni tipi s katerimi se bomo največ ukvarjali so:
+\begin{itemize}
+    \item \lstinline{Nat} naravna števila
+    \item \lstinline{Int} cela števila
+    \item \lstinline{String} nizi
+    \item \lstinline{List} seznami
+\end{itemize}
+Lean načeloma tipe izrazov ugotovi sam, lahko pa jih tudi podamo. Na primer
+\begin{lstlisting}
+#eval 2
+\end{lstlisting}
+se izračuna v 2, Lean pa nam pove da je tip izraza \lstinline{Nat}. Če pa želimo izraz izračunati kot \lstinline{Int} lahko to naredimo z
+\begin{lstlisting}
+#eval (2 : Int)
+\end{lstlisting}
+kar nam potem predstavlja 2 kot celo število. Lean ponavadi namesto
+\lstinline{Nat} uporabi oznako \lstinline{ℕ} in namesto \lstinline{Int} oznako \lstinline{ℤ}, to pa lahko uporabljamo tudi mi
+da se program bolj ujema z matematičnim zapisom. 
+
+Poglejmo si sedaj kako definiramo funkcije
+\begin{lstlisting}
+def f (x : ℕ) : ℕ := x + 1
+\end{lstlisting}
+Definirali smo funkcijo \lstinline{f} ki sprejme naravno število in vrne naravno število. Funkcijo lahko poračunamo podobno kot izraze
+\begin{lstlisting}
+#eval f 2
+\end{lstlisting}
+ki se izračuna v 3. Če nismo prepričani kakšen tip ima nek objekt v leanu lahko to ugotovimo z ukazom
+\begin{lstlisting}
+#check f
+\end{lstlisting}
+ki nam vrne \lstinline{ℕ → ℕ} torej je funkcija $f$ preslikava iz naravnih števil v naravna števila.
+
+Lahko definiramo tudi funkcije več spremenljivk
+\begin{lstlisting}
+def sum (x: ℕ) (y: ℕ) : ℕ := x + y
+\end{lstlisting}
+ki ima tip \lstinline{ℕ → ℕ → ℕ} torej je preslikava iz naravnih števil v preslikave iz naravnih števil v naravna števila.
+Ker imata oba argumenta funkcije isti tip lahko definicijo skrajšamo
+\begin{lstlisting}
+def sum (x y: ℕ) : ℕ := x + y
+\end{lstlisting}
+Ker lean zna sam ugotoviti tip vsote dveh naravnih števil tega ni potrebno podati je pa včasih to bolj berljivo
+\begin{lstlisting}
+def sum (x y: ℕ) := x + y
+\end{lstlisting}
+Še krajše pa gre z lambda zapisom
+\begin{lstlisting}
+λ x y:ℕ => x + y
+\end{lstlisting}
+
+\subsubsection{Strukture}
+Podobno kot v večini programskih jezikov lahko tudi v Leanu definiramo strukture ki so ponavadi namenjene temu da združimo več podatkov v en objekt.
+\begin{lstlisting}
+structure Tocka :=
+    x: Nat
+    y: Nat
+\end{lstlisting}
+Objekt neke strukture definiramo tako da navedemo vrednosti vseh polj
+\begin{lstlisting}
+def izhodisce : Tocka := {x := 0, y := 0}
+\end{lstlisting}
+Tudi te tipe lahko uporabljamo kot argumente ali rezultate funkcij.
+
+% TODO: finish lean tutorial
+
+
+
+\section{Osnovne definicije v Leanu}
+Pogjemo si sedaj kako smo definirali osnovne pojme iz teorije grafov v Leanu.
+Za berljivost ne bomo dodajali celotne kode ampak le odseke pomembne za razumevanje.
+Celotna koda je dostopna na \url{https://github.com/grekiki2/Lean-tests}.
+\begin{lstlisting}
+structure Graph :=
+    vertexSize : Nat
+    connected: Fin vertexSize → Fin vertexSize → Pro
+    connected_decidable: ∀ a b, Decidable (connected a b)
+    irreflexive: ∀ n, ¬ connected n n
+    symmetric: ∀ a b, connected a b → connected b a
+\end{lstlisting}
+Graf torej definiramo kot strukturo kjer podamo število vozlišč, izračunljivo funkcijo ki nam pove
+ali sta dve vozlišči povezani ter potrdilo da je relacija povezanosti irefleksivna in simetrična.
+
+Za namene testiranja definiramo še graf $K_n$, ki je graf z $n$ vozlišči in povezavami med vsemi pari vozlišč.
+\begin{lstlisting}
+def K_n (k:Nat): Graph :=
+  {vertexSize:=k, connected:=(λ x y=>x ≠ y), connected_decidable := by simp; intro a b;apply Not.decidable, irreflexive := by simp, symmetric:= by apply Ne.symm }
+\end{lstlisting}
+Na podoben način definiramo tudi $C_n$ oziroma cikličen graf z $n$ vozlišči.
+
+Definiramo še tip ki predstavlja $k$ barvanje grafa
+\begin{lstlisting}
+def Coloring (G:Graph) (k : Nat) := Fin G.vertexSize → Fin k
+\end{lstlisting}
+
+Predstavili smo $k$ barvanje grafa kot preslikavo iz (indeksa) vozlišča v eno izmed $k$ barv.
+Definiramo še kdaj je $k$ barvanje veljavno
+\begin{lstlisting}
+def valid_coloring (G:Graph) {k:Nat} (coloring: Coloring G k): Prop :=
+  ∀ a b, GraphConnected G a b → coloring a ≠ coloring b
+\end{lstlisting}
+Sledimo definiciji iz drugega poglavja. Torej z besedami, barvanje je veljavno 
+če sta sosednji vozlišči vedno pobarvani z različnima barvama.
+
+Ker preslikava preverja povezanost za končno število elementov se lahko uporablja za računanje. Drugače rečeno, smiselno
+je napisati
+\begin{lstlisting}
+#eval valid_coloring (K_n 5) (λ x => 0)
+\end{lstlisting}
+in pričakovati da Lean to izračuna. Lean na žalost izračunljivosti tega izraza ne ugotovi sam, zato moramo pokazati, 
+da je \lstinline{valid_coloring} izračunjiv oz v Leanu decidable.
+\begin{lstlisting}
+instance (G: Graph) (k:Nat) (coloring: Coloring G k): Decidable (@valid_coloring G k coloring)
+    exact Nat.decidableForallFin _
+\end{lstlisting}
+
+Zdaj lahko torej za neko barvanje z Leanom preverimo ali je veljavno ali ne. 
+
+
+\end{document}

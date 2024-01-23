@@ -8,8 +8,7 @@ import Mathlib.Init.Function
 -- K_n
 def G_ex: Graph := K_n 4
 
-instance (G: Graph) (k:Nat): DecidablePred (@valid_coloring G k) := by
-  intro coloring
+instance (G: Graph) (k:Nat) (coloring: Coloring G k): Decidable (@valid_coloring G k coloring) := by
   exact Nat.decidableForallFin _
 
 def is_k_colorable (G : Graph) (k: Nat) : Prop :=
