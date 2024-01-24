@@ -2,7 +2,7 @@ import Graph.Chromatic
 import Graph.Graph
 import Mathlib
 
-def is_2_colorable (G :Graph) :Bool := is_k_colorable G 2
+def Is2Colorable (G :Graph) :Bool := is_k_colorable G 2
 
 
 -- #eval is_2_colorable (C_n 4 (by linarith))
@@ -10,7 +10,7 @@ def is_2_colorable (G :Graph) :Bool := is_k_colorable G 2
 
 -- #check chromatic_number_of_C_n_odd 1
 
-def find_2coloring (G:Graph) : Sum Unit (Sum (Array (Fin 2)) (List (Fin G.vertexSize))) := Id.run <| do
+def Find2Coloring (G:Graph) : Sum Unit (Sum (Array (Fin 2)) (List (Fin G.vertexSize))) := Id.run <| do
   let mut coloring: Array (Option (Fin 2)) := Array.mkArray G.vertexSize none
   let mut par: Array (Option (Fin G.vertexSize)) := Array.mkArray G.vertexSize none
   for i in [0:G.vertexSize] do
@@ -71,8 +71,8 @@ def find_2coloring (G:Graph) : Sum Unit (Sum (Array (Fin 2)) (List (Fin G.vertex
 
 -- #eval find_2coloring (C_n 1000 (by linarith))
 
-def is_2_colorable_fast (G : Graph):Bool :=
-  match find_2coloring G with
+def Is2ColorableFast (G : Graph):Bool :=
+  match Find2Coloring G with
   | Sum.inl _ => is_k_colorable G 2
   | Sum.inr (Sum.inl coloring) =>
     if h:coloring.size = G.vertexSize then
@@ -113,7 +113,7 @@ lemma mod_exists (n:Nat) (h:n%2=1): ∃ k,n=2*k+1 := by {
       _ = n'+1 := by {rw [h]; simp}
     exact q.symm
 }
-theorem chromatic_number_of_C_n (n:Nat) (h:n≥2): chromatic_number (C_n n h) = 2+(n%2) := by
+theorem chromatic_number_of_C_n (n:Nat) (h:n≥2): ChromaticNumber (C_n n h) = 2+(n%2) := by
   match mod:n%2 with
   | 0 =>
     have ⟨num, h2⟩ := mod_exists_0 n (by linarith)
@@ -134,10 +134,10 @@ theorem chromatic_number_of_C_n (n:Nat) (h:n≥2): chromatic_number (C_n n h) = 
     rw [mod] at q2
     linarith
 
-theorem is_2_colorable_fast_correct : is_2_colorable_fast = is_2_colorable := by
+theorem is_2_colorable_fast_correct : Is2ColorableFast = Is2Colorable := by
   funext G
-  unfold is_2_colorable is_2_colorable_fast
-  match h:find_2coloring G with
+  unfold Is2Colorable Is2ColorableFast
+  match h:Find2Coloring G with
   | Sum.inl _ => simp
   | Sum.inr (Sum.inl coloring) =>
     simp
@@ -147,8 +147,8 @@ theorem is_2_colorable_fast_correct : is_2_colorable_fast = is_2_colorable := by
   | Sum.inr (Sum.inr cycle) =>
     simp
     intro len h2 h3
-    have q:= sub_le_chromatic G (C_n cycle.length (by linarith)) (λ idx => cycle[idx]) h2
-    suffices ch3:chromatic_number (C_n (List.length cycle) (by linarith)) = 3 from by {
+    have q:= subgraph_chromatic_number_le G (C_n cycle.length (by linarith)) (λ idx => cycle[idx]) h2
+    suffices ch3:ChromaticNumber (C_n (List.length cycle) (by linarith)) = 3 from by {
       rw [ch3] at q
       apply (no_coloring_gives_lb G 2).mpr
       exact q
@@ -157,6 +157,6 @@ theorem is_2_colorable_fast_correct : is_2_colorable_fast = is_2_colorable := by
     simp [h3]
 
 
-#eval is_2_colorable_fast (K_n 1000)
-#eval is_2_colorable_fast (C_n 1000 (by linarith))
-#eval is_2_colorable_fast (C_n 1001 (by linarith))
+#eval Is2ColorableFast (K_n 1000)
+#eval Is2ColorableFast (C_n 1000 (by linarith))
+#eval Is2ColorableFast (C_n 1001 (by linarith))

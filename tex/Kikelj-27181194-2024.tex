@@ -26,8 +26,6 @@
 
 % - ime datoteke z viri (vključno s končnico .bib), če uporabljate BibTeX
 % \literatura{....bib}
-
-
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
@@ -206,8 +204,11 @@ Tudi te tipe lahko uporabljamo kot argumente ali rezultate funkcij.
 
 \section{Osnovne definicije v Leanu}
 Pogjemo si sedaj kako smo definirali osnovne pojme iz teorije grafov v Leanu.
-Za berljivost ne bomo dodajali celotne kode ampak le odseke pomembne za razumevanje.
+Za berljivost bomo večino dokazov spuščali.
 Celotna koda je dostopna na \url{https://github.com/grekiki2/Lean-tests}.
+Vsekakor je v primerjavi s papirjem, boljše dokaze pregledovati znotraj urejevalnika npr. VSCode, ki nam omogoča da v vsakem delu dokaza vidimo 
+trenutne predpostavke in željen rezultat. 
+
 \begin{lstlisting}
 structure Graph :=
     vertexSize : Nat
@@ -224,7 +225,7 @@ Za namene testiranja definiramo še graf $K_n$, ki je graf z $n$ vozlišči in p
 def K_n (k:Nat): Graph :=
   {vertexSize:=k, connected:=(λ x y=>x ≠ y), connected_decidable := by simp; intro a b;apply Not.decidable, irreflexive := by simp, symmetric:= by apply Ne.symm }
 \end{lstlisting}
-Na podoben način definiramo tudi $C_n$ oziroma cikličen graf z $n$ vozlišči.
+Na podoben način definiramo tudi $C_n$ oziroma cikličen graf z $n$ vozlišči le da moramo podati še dokaz da je $n\ge2$.
 
 Definiramo še tip ki predstavlja $k$ barvanje grafa
 \begin{lstlisting}
@@ -253,6 +254,187 @@ instance (G: Graph) (k:Nat) (coloring: Coloring G k): Decidable (@valid_coloring
 \end{lstlisting}
 
 Zdaj lahko torej za neko barvanje z Leanom preverimo ali je veljavno ali ne. 
+Ker je množica barvanj grafa $G$ s $k$ barvami končna lahko definiramo tudi izračunljivo funkcijo ki nam 
+za graf $G$ pove ali obstaja $k$ barvanje
+\begin{lstlisting}
+def is_k_colorable (G : Graph) (k: Nat) : Prop :=
+  ∃ (coloring : Coloring G k), valid_coloring G coloring
+\end{lstlisting}
+
+Tudi ta funkcija je izračunljiva ker je množica barvanj grafa $G$ s $k$ barvami končna.
+\begin{lstlisting}
+instance {G : Graph} (k : Nat) : Decidable (is_k_colorable G k) := Fintype.decidableExistsFintype
+\end{lstlisting}
+
+Sedaj lahko končno definiramo kromatsko število grafa $G$ kot najmanjše število $k$, da velja
+\lstinline{is_k_colorable G k}. V Leanu(oziroma bolj natančno Mathlibu) to naredimo s pomočjo funkcije \lstinline{Nat.find}
+ki kot argumente vzame:
+\begin{itemize}
+    \item \lstinline{p : Nat → Prop} Izračunljiv predikat za katerega iščemo najmanjše število da velja \lstinline{p}
+    \item \lstinline{h : ∃ n, p n} dokaz da obstaja neko naravno število za katerega velja \lstinline{p}
+\end{itemize}
+
+Definicija kromatskega števila v Leanu je potem
+\begin{lstlisting}
+def ChromaticNumber (G: Graph): ℕ :=
+  @Nat.find (is_k_colorable G) _ (by {
+    unfold is_k_colorable valid_coloring GraphConnected
+    use G.vertexSize, λ i=>i
+    intro a b hab
+    by_contra h
+    simp [← h] at hab
+    exact (G.irreflexive a) hab
+  })
+\end{lstlisting}
+Vzamemo torej najmanjše število barv da je graf $G$ $k$ barvljiv, zraven pa dokažemo da vsaj eno tako število obstaja.
+Najbolj preprosto to naredimo tako da vzamemo število vozlišč grafa $G$ in definiramo barvanje ki vsakemu vozlišču priredi njegov indeks.
+V poglavju 2 smo se prepričali, da je to res veljavno barvanje.
+
+
+
+
+
+\section{Računanje kromatskega števila}
+Funkcijo \lstinline{chromatic_number} lean prepozna kot izračunljivo in jo lahko že uporabljamo za interaktivno računanje
+kromatskega števila. Na primer
+\begin{lstlisting}
+#eval ChromaticNumber (K_n 8)
+\end{lstlisting}
+nam vrne 8 (po nekaj sekundah). Podobno nam
+\begin{lstlisting}
+#eval ChromaticNumber (C_n 13 (by linarith))
+\end{lstlisting}
+vrne 3 in
+\begin{lstlisting}
+#eval ChromaticNumber (C_n 14 (by linarith))
+\end{lstlisting}
+vrne 2. Za računanje kromatskega števila seveda obstajo hitrejši algoritmi kot je naš, 
+ki to dela na način da preveri vsa možna barvanja pri nekem $k$ dokler ne najde veljavnega, ali pa gre 
+na naslednji $k$, vendar pa je dokazovanje pravilnosti kompleksnejših algoritmov izredno kompleksno.
+
+Lahko pa si pomagamo s t.i.\ pričami. Vemo, da če imamo neko barvanje grafa s tremi barvami, je kromatsko število največ 3. 
+Barvanje lahko poišče nek kompleksen algoritem, Lean pa mora potem le preveriti da je veljavno. Da si bomo lahko pomagali s takimi
+prijemi, pa potrebujemo nekaj pomožnih lem. 
+
+Najprej bomo pokazali da če obstaja $k$ barvanje grafa $G$, je kromatsko število grafa $G$ največ $k$. Da to storimo pa potrebujemo
+lemo ki nam pove da iz barvanja grafa $G$ s $k$ barvami lahko tvorimo barvanje grafa $G$ z $l$ barvami, če je le $l\geq k$.
+\begin{lstlisting}
+def extend_coloring (G:Graph) (k1 k2: Nat) (h:k2≥k1) (coloring: Coloring G k1) (h2: valid_coloring G coloring):∃ coloring2:Coloring G k2, valid_coloring G coloring2
+\end{lstlisting}
+Nato lahko dokažemo da $k$ barvanje grafa $G$ obstaja če in samo če je kromatsko število grafa $G$ največ $k$.
+\begin{lstlisting}
+lemma colorable_gives_ub (G: Graph) (k: Nat):
+    is_k_colorable G k ↔ chromatic_number G ≤ k
+\end{lstlisting}
+\begin{proof}
+Najprej dokažimo implikacijo v desno. Kromatsko število smo definirali kot najmanjši $i$ da je graf $G$ $i$ barvljiv.
+Če je torej graf $G$ $k$ barvljiv potem je kromatsko število grafa $G$ največ $k$.
+V levo, če vemo da je kromatsko število grafa $G$ največ $k$ potem obstaja barvanje grafa $G$ z največ $k$ barvami
+ki ga lahko razširimo do barvanja s $k$ barvami po lemi \lstinline{extend_coloring}.
+\end{proof}
+
+Posledica je da če in samo če barvanje s $k$ barvami ne obstaja je $k$ manjši od kromatskega števila grafa $G$.
+\begin{lstlisting}
+lemma not_colorable_gives_lb (G: Graph) (k: Nat) :
+    ¬ is_k_colorable G k ↔ k < chromatic_number G
+\end{lstlisting}
+
+Iz navedenega dobimo glavno posledico.
+Če najdemo nek $k$ da graf $G$ ni $k$ barvljiv je pa $k+1$ barvljiv potem je kromatsko število grafa $G$ enako $k+1$.
+\begin{lstlisting}
+theorem bounds_give_chromatic (G:Graph) (k: Nat):
+    ¬is_k_colorable G k ∧ is_k_colorable G (k+1) ↔ chromatic_number G = k+1
+\end{lstlisting}
+
+Če sedaj na dokazano gledamo iz vidika uporabnosti je precej preprosto Leanu razložiti da je graf $G$ $k$ barvljiv
+(če je to res, razlaganje napačnih stvari načeloma naj ne bi bilo mogoče) recimo tako da najdemo neko barvanje. Večji problem pa je
+s spodnjo mejo kromatskega števila. 
+V tem delu se bomo spodnje meje lotili s pomočjo podgrafov.
+
+
+\subsection{Podgrafi}
+Dokažimo naslednji izrek
+\begin{lstlisting}
+theorem subgraph_chromatic_number_le (G G2:Graph) (f:Fin G2.vertexSize → Fin G.vertexSize) (f_inherits: ∀ a b, G2.connected a b → G.connected (f a) (f b)):
+    ChromaticNumber G2 ≤ ChromaticNumber G
+\end{lstlisting}
+Uporabili smo definicijo podgrafa ki je bolj primerna za Lean kot standardna definicija.
+Graf $G2$ je podgraf grafa $G$ če obstaja preslikava $f$ ki vozlišča $G2$ preslika v vozlišča $G$ tako, 
+da če sta vozlišči v $G2$ povezani sta povezani tudi preslikani verziji teh vozlišč v $G$.
+
+Izrek pravi da če je $G'$ podgraf $G$, potem je kromatsko število grafa $G'$ manjše ali enako kromatskemu številu grafa $G$.
+\begin{proof}
+Po definiciji kromatskega števila je dovolj dokazati, da lahko graf $G'$ pobarvamo z $\chi(G)$ barvami. Naj bo $c_G$ 
+neko $\chi(G)$ barvanje grafa $G$. Trdimo da je $c_{G'}$ definirano kot $c_{G'}(i) = c_G(f(i))$ veljavno barvanje grafa $G'$. 
+Barvanje je veljavno če sta sosednji vozlišči vedno pobarvani z različnima barvama. Naj bosta $a, b$ sosednji vozlišči grafa $G'$.
+Potem sta po definiciji podgrafa sosednji tudi vozlišči $f(a), f(b)$ v grafu $G$. Ker je $c_G$ veljavno barvanje grafa $G$, je 
+$c_G(f(a))\neq c_G(f(b))$. Ker je $c_{G'}(a) = c_G(f(a))$ in $c_{G'}(b) = c_G(f(b))$ je tudi $c_{G'}(a)\neq c_{G'}(b)$.
+\end{proof}
+Opomba: pri definiciji podgrafa bi načeloma morali zahtevati injektivnost vendar pa je nikjer v dokazih ne potrebujemo zato
+tega v Leanu nismo naredili. 
+
+Zdaj si lahko pomagamo pri iskanju spodnjih mej kromatskega števila tako da najdemo nek manjši podgraf ki 
+ima čim večje kromatsko število. V praksi se recimo pogosto uporablja $K_n$ klike ki imajo kromatsko število $n$, 
+ali pa $C_n$ ciklični grafi ki imajo kromatsko število $2$ če je $n$ sodo in $3$ če je $n$ liho število.
+
+V delu se bomo osredotočili na ciklične grafe.
+
+\subsection{Kromatsko število cikličnih grafov}
+Dokažimo da je kromatsko število cikličnega grafa s sodim številom vozlišč enako $2$.
+\begin{lstlisting}
+theorem chromatic_number_of_C_n_even (n:Nat) (h:2*n≥2):
+    chromatic_number (C_n (2*n) h) = 2
+\end{lstlisting}
+\begin{proof}
+Potrebno je dokazati da barvanje z 1 barvo ni mogoče in da obstaja barvanje z 2 barvama.
+Prvi del je očiten, dovolj je pokazati da ima graf vsaj eno povezavo kar lahko naredimo ker ima graf vsaj dve vozlišči.
+
+Za drugi del pa moramo najti barvanje z dvema barvama, edina rešitev (do permutacije barv) je da vozlišče
+$n$ pobarvamo z $n\bmod 2$. Dokaz da je barvanje pravilno je sicer v Leanu nekoliko dolg, ni pa se o tem
+težko prepričati, preveriti je potrebno le da sta vozlišči $0$ in $2n-1$, ter za vsak $0\le i<2n-1$, $i$ in $i+1$ različne barve.
+\end{proof}
+
+Za pokritje vseh cikličnih grafov potrebujemo še dokaz da je kromatsko število cikličnega grafa s lihim številom vozlišč enako $3$.
+\begin{lstlisting}
+theorem chromatic_number_of_C_n_odd (n:Nat) (h:2*n+1≥2):
+    chromatic_number (C_n (2*n+1) h) = 3
+\end{lstlisting}
+\begin{proof}
+Kot prej je dovolj dokazati da 2 barvanje ne obstaja ter najti 3 barvanje. 
+Za 3 barvanje vzamemo preslikavo ki vozlišče $i$ slika v $i\bmod 2$, razen če je $i=0$ ki ga slika v $2$.
+Podobno kot pri sodem številu vozlišč se je precej enostavno prepričati da je to barvanje res veljavno. 
+
+Sedaj moramo dokazati da 2 barvanje ne obstaja. Bšs je vozlišče $0$ pobarvano z barvo $0$.
+Z indukcijo po $i$ bomo pokazali da je vozlišče $i$ pobarvano z barvo $i\bmod 2$.
+Za $i=0$ je to res. Predpostavimo da je za nek $i$ vozlišče $i$ pobarvano z barvo $i\bmod 2$.
+Ker sta vozlišči $i$ in $i+1$ povezani je vozlišče $i+1$ pobarvano z barvo $i\bmod 2 + 1 = (i+1)\bmod 2$.
+S tem smo končali indukcijo.
+Poglejmo si sedaj vozlišči $0$ in $2n$. Po lemi sta obe pobarvani z barvo $0$, vendar pa sta povezani kar je protislovje.
+Torej 2 barvanje ne obstaja. 
+\end{proof}
+
+\section{2 barvljivost}
+Hitri algoritmi za računanje kromatskega števila v splošnem niso znani, 
+ve se recimo da je problem določiti ali je graf 3 barvljiv NP poln.
+Za 2 barvljivost pa hiter algoritem obstaja in ga bomo tudi implementirali v Leanu ter dokazali njegovo pravilnost. 
+Naš trenuten algoritem porabi $O(n^22^n)$ časa, kjer je $n$ število vozlišč grafa ker mora pregledati vsa možna barvanja.
+
+Implementacija je dostopna na \url{https://github.com/grekiki2/Lean-tests/blob/chromatic-2/Graph/2Colorable.lean}, tukaj pa
+bomo opisali princip delovanja. 
+Za enostavnost predpostavimo da je graf povezan.
+Algoritem vozlišče $0$ pobarva z barvo $0$, in začne z iskanjem v širino. Za vsako vozlišče se tudi beleži
+predhodnika oziroma vozlišče iz katerega smo prišli. Ko obiščemo novo vozlišče ga poskusimo pobarvati drugače od vseh sosedov.
+Če barvanje vseh vozlišč uspe, potem vrnemo barvanje ki ga Lean lahko preveri in s tem dokaže da je graf 2 barvljiv.
+Če barvanje ne uspe potem obstaja vozlišče $i$ s sosedoma $j$ in $k$ ki sta različnih barv. To pa pomeni da imata vozlišči $j$ in $k$
+tudi različno parnost razdalje do vozlišča $0$(vsa vozlišča barve 0 so na sodi razdalji, vsa vozlišča barve 1 pa na lihi razdalji).
+Iz tega sledi da lahko tvorimo lih cikel kot pot $0\to j\to i\to k\to 0$. Lih cikel pa je v resnici pograf enak $C_{2n+1}$ za katerega
+vemo da ima kromatsko število $3$ po prejšnjem poglavju, to pa nam pove da graf ni 2 barvljiv.
+
+Lean v obeh primerih(torej da funkcija vrne barvanje ali pa lih cikel) preveri veljavnost priče. Če priča ni veljavna
+Lean uporabi počasno verzijo algoritma za iskanje barvanja. 
+S tem dobimo hiter in pravilen algoritem za določanje 2 barvljivost grafa, je pa res, da smo uspeli dokazati le pravilnost
+ne pa tudi hitrosti. V praksi nam ta algoritem omogoča da v pod sekundi določimo 2 barvljivost grafov z do 1000 vozlišči
+kar je za naše potrebe dovolj.
 
 
 \end{document}
