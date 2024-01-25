@@ -4,13 +4,7 @@ import Mathlib
 
 def Is2Colorable (G :Graph) :Bool := is_k_colorable G 2
 
-
--- #eval is_2_colorable (C_n 4 (by linarith))
--- #eval is_2_colorable (C_n 5 (by linarith))
-
--- #check chromatic_number_of_C_n_odd 1
-
-def Find2Coloring (G:Graph) : Sum Unit (Sum (Array (Fin 2)) (List (Fin G.vertexSize))) := Id.run <| do
+def Find2Coloring (G:Graph) : Sum Unit (Sum (Array (Fin 2)) (List (Fin G.vertexSize))) := Id.run do
   let mut coloring: Array (Option (Fin 2)) := Array.mkArray G.vertexSize none
   let mut par: Array (Option (Fin G.vertexSize)) := Array.mkArray G.vertexSize none
   for i in [0:G.vertexSize] do
@@ -88,7 +82,7 @@ def Is2ColorableFast (G : Graph):Bool :=
 #check Nat.mod
 #check Nat.div_add_mod
 #check Nat.sub
-lemma mod_exists_0 (n:Nat) (h:n%2=0): ∃ k,n=2*k := by {
+lemma mod_exists_0 (n:Nat) (h:n%2=0): ∃ k,n=2*k := by
   use n/2
   match n with
   | 0 => simp;
@@ -99,8 +93,9 @@ lemma mod_exists_0 (n:Nat) (h:n%2=0): ∃ k,n=2*k := by {
       _ = (n'+1)-(n'+1)%2 := by rw [Nat.div_add_mod]
       _ = n'+1 := by {rw [h]; simp}
     exact q.symm
-}
-lemma mod_exists (n:Nat) (h:n%2=1): ∃ k,n=2*k+1 := by {
+
+
+lemma mod_exists (n:Nat) (h:n%2=1): ∃ k,n=2*k+1 := by
   use n/2
   -- rw [Nat.div_add_mod 2 n]
   match n with
@@ -112,7 +107,7 @@ lemma mod_exists (n:Nat) (h:n%2=1): ∃ k,n=2*k+1 := by {
       _ = (n'+1)-(n'+1)%2+1 := by rw [Nat.div_add_mod]
       _ = n'+1 := by {rw [h]; simp}
     exact q.symm
-}
+
 theorem chromatic_number_of_C_n (n:Nat) (h:n≥2): ChromaticNumber (C_n n h) = 2+(n%2) := by
   match mod:n%2 with
   | 0 =>
@@ -157,6 +152,6 @@ theorem is_2_colorable_fast_correct : Is2ColorableFast = Is2Colorable := by
     simp [h3]
 
 
-#eval Is2ColorableFast (K_n 1000)
-#eval Is2ColorableFast (C_n 1000 (by linarith))
-#eval Is2ColorableFast (C_n 1001 (by linarith))
+#eval Is2ColorableFast (K_ 1000)
+#eval Is2ColorableFast (C_ 1000)
+#eval Is2ColorableFast (C_ 1001)

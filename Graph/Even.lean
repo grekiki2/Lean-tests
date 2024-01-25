@@ -1,4 +1,5 @@
 import Mathlib
+import Init.Data.Random
 
 theorem succ_ne_mod (n:Nat): n%2 ≠ (n+1)%2 := by
   induction n with

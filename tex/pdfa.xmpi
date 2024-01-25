@@ -62,7 +62,7 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"> 
    <dc:format>application/pdf</dc:format> 
-   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Preverjanje kromatskega števila grafov z dokazovalnim pomočnikom Lean</rdf:li></rdf:Alt></dc:title>
+   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Preverjanje kromatičnega števila grafov z dokazovalnim pomočnikom Lean</rdf:li></rdf:Alt></dc:title>
    <dc:creator><rdf:Seq><rdf:li>Gregor Kikelj</rdf:li></rdf:Seq></dc:creator>
    <dc:description><rdf:Alt><rdf:li xml:lang="x-default">Delo diplomskega seminarja, Matematika, ..., ...</rdf:li></rdf:Alt></dc:description>
    <dc:subject><rdf:Bag><rdf:li>...</rdf:li>
@@ -78,15 +78,15 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"> 
    <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool> 
-   <xmp:ModifyDate>2024-01-24T01:26:44+01:00</xmp:ModifyDate> 
-   <xmp:CreateDate>2024-01-24T01:26:44+01:00</xmp:CreateDate> 
-   <xmp:MetadataDate>2024-01-24T01:26:44+01:00</xmp:MetadataDate> 
+   <xmp:ModifyDate>2024-01-25T15:24:11+01:00</xmp:ModifyDate> 
+   <xmp:CreateDate>2024-01-25T15:24:11+01:00</xmp:CreateDate> 
+   <xmp:MetadataDate>2024-01-25T15:24:11+01:00</xmp:MetadataDate> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpRights = "http://ns.adobe.com/xap/1.0/rights/"> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"> 
    <xmpMM:DocumentID>uuid:54E775C5-BD78-EE51-2221-C914D51F1502</xmpMM:DocumentID> 
-   <xmpMM:InstanceID>uuid:45E8E4FA-FAE1-07A8-4B5F-DB2AD2B8F27A</xmpMM:InstanceID> 
+   <xmpMM:InstanceID>uuid:A6F94050-44C7-1B21-7392-1F096C8F0A4C</xmpMM:InstanceID> 
   </rdf:Description> 
  </rdf:RDF> 
 </x:xmpmeta> 

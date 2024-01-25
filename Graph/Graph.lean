@@ -21,6 +21,9 @@ def K_n (k:Nat): Graph :=
   , irreflexive := by simp
   , symmetric := by apply Ne.symm
   }
+notation:120 "K_" arg:100 => K_n arg
+
+#check K_ 2
 
 def C_n (k:Nat) (h:k≥2): Graph :=
   {vertexSize:=k
@@ -29,6 +32,9 @@ def C_n (k:Nat) (h:k≥2): Graph :=
   , irreflexive := by intro n h2; simp at h2; linarith
   , symmetric:= by intro a b; simp; tauto
   }
+notation:120 "C_"arg:100 => C_n arg (by linarith)
+
+#check C_ 2
 
 def getEdgeListForNode (G:Graph) (i:Fin G.vertexSize) : Array (Fin G.vertexSize) :=
   let ls := List.filter (λ j => GraphConnected G i j) (List.finRange G.vertexSize)
