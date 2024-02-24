@@ -253,7 +253,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \textwidth 15cm
-\textheight 24cm
+\textheight 22cm
 \oddsidemargin.5cm
 \evensidemargin.5cm
 \topmargin-5mm

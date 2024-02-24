@@ -51,8 +51,8 @@ def Find2Coloring (G:Graph) : Sum Unit (Sum (Array (Fin 2)) (List (Fin G.vertexS
                       | some par2' =>
                         path2 := par2' :: path2
                         vert := par2'
-                    dbg_trace path1
-                    dbg_trace path2
+                    -- dbg_trace path1
+                    -- dbg_trace path2
                     return Sum.inr (Sum.inr (path1 ++ (List.reverse path2.tail)))
           }
   let mut coloringAns : Array (Fin 2) := Array.mkArray G.vertexSize 0
