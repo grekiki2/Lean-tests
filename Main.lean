@@ -1,18 +1,21 @@
 import Graph
 def k_colorable_test (p:Nat) (g:StdGen) (n:Nat) (colors:Nat) : Bool := Id.run do
-  let mut edges : Array (Array (Fin n)) := {}
+  let mut edges : List (List (Fin n)) := []
   for _ in [0:n] do
-    edges := edges.push (List.toArray [])
+    edges := [] :: edges
   let mut a:= randNat g 0 100
   for i in [0:n] do
     for j in [0:n] do
       if i < j then
         a := randNat a.snd 0 100
         if h:a.fst < p ∧ i<n ∧ j<n then
-          edges := edges.set! i ((edges.get! i).push ⟨j, by linarith⟩)
-          edges := edges.set! j ((edges.get! j).push ⟨i, by linarith⟩)
+        edges := edges.set i (⟨j, by linarith⟩::edges.get! i)
+        edges := edges.set j (⟨i, by linarith⟩::edges.get! j)
+          -- edges := edges.set! i ((edges.get! i).push ⟨j, by linarith⟩)
+          -- edges := edges.set! j ((edges.get! j).push ⟨i, by linarith⟩)
 
-  if h: edges.size = n then
+
+  if h: edges.length = n then
     let mut g1 : Graph := {
       vertexSize := n
       , connected := λ x y => x≠y ∧ (y ∈ edges[x]'(by rw [h]; exact Fin.prop x) ∨ x ∈ edges[y]'(by rw [h]; exact Fin.prop y))

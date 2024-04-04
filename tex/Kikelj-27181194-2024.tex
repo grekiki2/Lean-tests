@@ -639,7 +639,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \begin{center}
 \includegraphics[scale=0.35]{assets/2barvSlow}
 \caption{Poraba časa algoritma za preverjanje 2 barvljivosti grafa $G(n, p)$}
-\label{slika2}
+\label{slika3}
 \end{center}
 \end{figure}
 
@@ -647,7 +647,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \begin{center}
 \includegraphics[scale=0.35]{assets/3barvSlow}
 \caption{Poraba časa algoritma za preverjanje 3 barvljivosti grafa $G(n, p)$}
-\label{slika2}
+\label{slika4}
 \end{center}
 \end{figure}
 
@@ -655,7 +655,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \begin{center}
 \includegraphics[scale=0.35]{assets/5barvSlow}
 \caption{Poraba časa algoritma za preverjanje 5 barvljivosti grafa $G(n, p)$}
-\label{slika2}
+\label{slika5}
 \end{center}
 \end{figure}
 
@@ -679,11 +679,23 @@ Na podoben način smo preizkusili tudi hitrejši algoritem za preverjanje $2$ ba
 \begin{center}
 \includegraphics[scale=0.4]{assets/2barvFast}
 \caption{Poraba časa hitrega algoritma za preverjanje 2 barvljivosti grafa $G(n, p)$}
-\label{slika2}
+\label{slika6}
 \end{center}
 \end{figure}
 
 Vidimo da je algoritem za katerega smo trdili, da je hitrejši brez dokaza, (in dokazali pravilnost), res bistveno hitrejši.
+Pomembno je tudi, da je tukaj $y$ os krajša kot v prejšnjih grafih.
+Za primerjavo različnih podatkovnih struktur smo enak algoritem pognali tudi na leanovem tipu \lstinline{List} ki pa je osnovan
+na strukturi povezanega seznama in zato pričakovano počasnejši.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.4]{assets/2barvFastList}
+\caption{Poraba časa hitrega algoritma za preverjanje 2 barvljivosti grafa $G(n, p)$ z uporabo \lstinline{List}}
+\label{slika7}
+\end{center}
+\end{figure}
+
 Še vedno ima nelinearno časovno zahtevnost, kar pa je smiselno, ker imamo recimo $O(n^2)$ povezav z našim $G(n, p)$ modelom.
 
 \section{Zaključek}
