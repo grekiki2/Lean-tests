@@ -370,7 +370,7 @@ Za začetek definiramo strukturo grafa.
 \begin{lstlisting}
 structure Graph :=
     vertexSize : Nat
-    connected: Fin vertexSize → Fin vertexSize → Pro
+    connected: Fin vertexSize → Fin vertexSize → Prop
     connected_decidable: ∀ a b, Decidable (connected a b)
     irreflexive: ∀ n, ¬ connected n n
     symmetric: ∀ a b, connected a b → connected b a
@@ -491,9 +491,9 @@ vrne 3 in
 \begin{lstlisting}
 #eval ChromaticNumber (C_n 14 (by linarith))
 \end{lstlisting}
-vrne 2. Za računanje kromatičnega števila seveda obstajo hitrejši algoritmi, kot je naša definicija, vendar pa je ta 
-ki to dela na način, da preveri vsa možna barvanja pri nekem $k$, dokler ne najde veljavnega ali pa gre 
-na naslednji $k$ vendar pa je dokazovanje pravilnosti kompleksnejših algoritmov izredno kompleksno.
+vrne 2. Za računanje kromatičnega števila seveda obstajo hitrejši algoritmi, kot je naša definicija, 
+ki deluje tako, da preveri vsa možna barvanja pri nekem $k$, dokler ne najde veljavnega ali pa gre 
+na naslednji $k$, vendar pa je dokazovanje pravilnosti kompleksnejših algoritmov precej zahtevno.
 
 Lahko pa si pomagamo s tako imenovanimi pričami. Vemo, da če imamo neko barvanje grafa s tremi barvami, je kromatično število največ 3. 
 Barvanje lahko poišče nek kompleksen algoritem, Lean pa mora potem le preveriti, da je veljavno. Da si bomo lahko pomagali s takimi
@@ -530,8 +530,7 @@ theorem bounds_give_chromatic (G:Graph) (k: Nat):
 \end{lstlisting}
 
 Če sedaj na dokazano gledamo iz vidika uporabnosti, je precej preprosto Leanu razložiti, da je graf $G$ $k$ barvljiv
-(če je to res razlaganje napačnih stvari, načeloma naj ne bi bilo mogoče), recimo tako, da najdemo neko barvanje. Večji problem pa je
-s spodnjo mejo kromatičnega števila. 
+ recimo tako, da najdemo neko barvanje. Večji problem pa je s spodnjo mejo kromatičnega števila. 
 V tem delu se bomo spodnje meje lotili s pomočjo podgrafov.
 
 
