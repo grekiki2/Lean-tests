@@ -515,7 +515,7 @@ lemma colorable_gives_ub (G: Graph) (k: Nat):
     is_k_colorable G k ↔ chromatic_number G ≤ k
 \end{lstlisting}
 \begin{proof}
-Najprej dokažimo implikacijo v desno. Kromatično število smo definirali kot najmanjši $i$, da je graf $G$ $i$ barvljiv.
+Najprej dokažimo implikacijo v desno. Kromatično število smo definirali kot najmanjši $i$, da je graf $G$ $i$-obarvljiv.
 Če je torej graf $G$ $k$-obarvljiv, potem je kromatično število grafa $G$ največ $k$.
 V levo če vemo, da je kromatično število grafa $G$ največ $k$, potem obstaja barvanje grafa $G$ z največ $k$ barvami
 ki ga lahko razširimo do barvanja s $k$ barvami po lemi \lstinline{extend_coloring}.
@@ -602,7 +602,7 @@ Torej 2 barvanje ne obstaja.
 
 \subsection{$2$-obarvljivost}
 Hitri algoritmi za računanje kromatičnega števila v splošnem niso znani, 
-ve se, da je na primer problem določiti ali je graf 3 barvljiv, NP poln.
+ve se, da je na primer problem določiti ali je graf $3$-obarvljiv, NP poln.
 Za $2$-obarvljivost pa hiter algoritem obstaja in ga bomo tudi implementirali v Leanu ter dokazali njegovo pravilnost. 
 Naš trenuten algoritem porabi $O(n^22^n)$ časa, kjer je $n$ število vozlišč grafa, ker mora pregledati vsa možna barvanja.
 
@@ -611,15 +611,15 @@ bomo opisali princip delovanja.
 Za enostavnost predpostavimo, da je graf povezan.
 Algoritem vozlišče $0$ pobarva z barvo $0$ in začne z iskanjem v širino. Za vsako vozlišče razen vozlišča 0, se tudi beleži
 predhodnika oziroma vozlišče, iz katerega smo prišli. Ko obiščemo novo vozlišče, ga poskusimo pobarvati drugače od vseh sosedov.
-Če barvanje vseh vozlišč uspe, potem vrnemo barvanje, ki ga Lean lahko preveri in s tem dokaže, da je graf 2 barvljiv.
+Če barvanje vseh vozlišč uspe, potem vrnemo barvanje, ki ga Lean lahko preveri in s tem dokaže, da je graf $2$-obarvljiv.
 Če barvanje ne uspe, potem obstaja vozlišče $i$ s sosedoma $j$ in $k$, ki sta različnih barv. To pa pomeni, da imata vozlišči $j$ in $k$
 tudi različno parnost razdalje do vozlišča $0$, ker so vsa vozlišča barve 0 na sodi razdalji, vsa vozlišča barve 1 pa na lihi razdalji.
 Iz tega sledi, da lahko tvorimo lih cikel kot pot $0\to j\to i\to k\to 0$. Lih cikel pa lahko obravnavamo kot pograf, enak $C_{2n+1}$, za katerega
-vemo, da ima kromatično število $3$, to pa nam pove, da graf ni 2 barvljiv.
+vemo, da ima kromatično število $3$, to pa nam pove, da graf ni $2$-obarvljiv.
 
 Lean v obeh primerih (torej, da funkcija vrne barvanje ali pa lih cikel) preveri veljavnost priče. Če priča ni veljavna
 Lean uporabi počasno verzijo algoritma za iskanje barvanja. Kot bomo videli v naslednjem poglavju, se to pri realnem testiranju ne zgodi. 
-S tem dobimo hiter in pravilen algoritem za določanje 2 barvljivost grafa, je pa res, da smo uspeli dokazati le pravilnost
+S tem dobimo hiter in pravilen algoritem za določanje $2$-obarvljivost grafa, je pa res, da smo uspeli dokazati le pravilnost
 ne pa tudi hitrosti.
 
 
@@ -634,7 +634,7 @@ def is_k_colorable (G : Graph) (k: Nat) : Prop :=
     ∃ (coloring : Coloring G k), valid_coloring G coloring
 \end{lstlisting}
 
-Barvljivost torej preverimo tako, da preverimo, ali izmed vseh mogočih barvanj obstaja barvanje z $k$ barvami.
+Obarvljivost torej preverimo tako, da preverimo, ali izmed vseh mogočih barvanj obstaja barvanje z $k$ barvami.
 
 Poglejmo si nekaj grafov porabe časa tega algoritma. Za testiranje algoritma bomo uporabili Erdős–Rényijeve grafe
 ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ vozlišči, kjer je vsaka povezava prisotna z verjetnostjo $p$.
@@ -642,7 +642,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.35]{assets/2barvSlow}
-\caption{Poraba časa algoritma za preverjanje 2 barvljivosti grafa $G(n, p)$}
+\caption{Poraba časa algoritma za preverjanje 2-obarvljivosti grafa $G(n, p)$}
 \label{slika3}
 \end{center}
 \end{figure}
@@ -650,7 +650,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.35]{assets/3barvSlow}
-\caption{Poraba časa algoritma za preverjanje 3 barvljivosti grafa $G(n, p)$}
+\caption{Poraba časa algoritma za preverjanje 3-obarvljivosti grafa $G(n, p)$}
 \label{slika4}
 \end{center}
 \end{figure}
@@ -658,7 +658,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.35]{assets/5barvSlow}
-\caption{Poraba časa algoritma za preverjanje 5 barvljivosti grafa $G(n, p)$}
+\caption{Poraba časa algoritma za preverjanje 5-obarvljivosti grafa $G(n, p)$}
 \label{slika5}
 \end{center}
 \end{figure}
@@ -674,15 +674,15 @@ počasnejše. To je pričakovano, saj je število možnih barvanj eksponentno v 
 Opazimo, da je pri grafih brez povezav algoritem najhitrejši, vendar še vedno eksponenten. Domnevamo, da se to zgodi, 
 ker Lean najprej generira vsa možna barvanja in šele nato preveri ali je katero veljavno. 
 
-Vidimo, da je za preverjanje $3$ in $5$ barvljivosti algoritem počasnejši, več kot je povezav, kar je smiselno, ker je pri velikem 
-številu povezav verjetnost, da barvanje obstaja manjše, zato program ne more ustaviti izvajanja, ko najde veljavno barvanje. Pri $2$
-barvljivosti ta opazka o hitrosti iz neznanih razlogov ne velja. 
+Vidimo, da je za preverjanje $3$ in $5$-obarvljivosti algoritem počasnejši, več kot je povezav, kar je smiselno, ker je pri velikem 
+številu povezav verjetnost, da barvanje obstaja manjše, zato program ne more ustaviti izvajanja, ko najde veljavno barvanje. 
+Pri $2$-obarvljivosti ta opazka o hitrosti iz neznanih razlogov ne velja. 
 
 Na podoben način smo preizkusili tudi hitrejši algoritem za preverjanje $2$-obarvljivosti.
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.4]{assets/2barvFast}
-\caption{Poraba časa hitrega algoritma za preverjanje 2 barvljivosti grafa $G(n, p)$}
+\caption{Poraba časa hitrega algoritma za preverjanje 2-obarvljivosti grafa $G(n, p)$}
 \label{slika6}
 \end{center}
 \end{figure}
@@ -695,7 +695,7 @@ na strukturi povezanega seznama in zato pričakovano počasnejši.
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.4]{assets/2barvFastList}
-\caption{Poraba časa hitrega algoritma za preverjanje 2 barvljivosti grafa $G(n, p)$ z uporabo \lstinline{List}}
+\caption{Poraba časa hitrega algoritma za preverjanje 2-obarvljivosti grafa $G(n, p)$ z uporabo \lstinline{List}}
 \label{slika7}
 \end{center}
 \end{figure}
