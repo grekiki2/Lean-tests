@@ -35,7 +35,7 @@ Finally, we implement and prove the correctness of an algorithm for checking 2-c
 % \literatura{....bib}
 \usepackage{hyperref}
 \usepackage{listings}
-\usepackage{color}
+\usepackage{xcolor}
 \definecolor{keywordcolor}{rgb}{0.7, 0.1, 0.1}   % red
 \definecolor{tacticcolor}{rgb}{0.0, 0.1, 0.6}    % blue
 \definecolor{commentcolor}{rgb}{0.4, 0.4, 0.4}   % grey
@@ -76,12 +76,14 @@ Na koncu definiramo nekaj algoritmov za iskanje kromatičnega števila in dokaž
     \end{itemize}
 \end{definicija}
 Če sta različni vozlišči $u, v$ elementa neke povezave iz $E$, to pišemo kot $u\sim v$ ter pravimo, da sta sosednji vozlišči in da sta krajišči povezave $uv\in E$.
+Opomba: Iz definicije vidimo, da se bomo ukvarjali z enostavnimi končnimi neusmerjenimi grafi, ker je cilj preverjati lastnosti za konkretne grafe ki jih
+lahko predstavimo v računalniku.
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=1]{assets/graph}
+\includegraphics[scale=0.15]{assets/graph}
 \caption{Primer grafa}
-\label{slika2}
+\label{slika_2}
 \end{center}
 \end{figure}
 
@@ -108,8 +110,9 @@ Z besedami: barvanje grafa s $k$ barvami je preslikava, ki vsakemu vozlišču pr
     \caption{Primer barvanja grafa}
     \label{slika2}
     \end{center}
-    \end{figure}
-    
+\end{figure}
+
+Če je $G$ graf in obstaja $k$-barvanje grafa $G$, pravimo, da je $G$ $k$-obarvljiv.
 \begin{definicija}
     Kromatično število grafa $G$, ki ga označimo kot $\chi(G)$, je najmanjše število, da obstaja $\chi(G)$ barvanje grafa $G$.
 \end{definicija} 
@@ -149,6 +152,72 @@ grafa $G$ je $f(v_i)\neq f(v_j)$.
     grafa $G$ enako najmanjšemu elementu $C_G$. Dovolj je dokazati, da je $C_H\subset C_G$, ker je minimum podmnožice vedno
     manjši ali enak minimumu celotne množice. Ker je $H$ podgraf $G$, je vsako barvanje grafa $G$ tudi barvanje grafa $H$.
     Torej, če obstaja $k$ barvanje grafa $G$, obstaja tudi $k$ barvanje grafa $H$, zato je $C_H\subset C_G$.
+\end{proof}
+
+\begin{lema}
+    Naj bo $f:V(G)\to [k1]$ barvanje grafa $G$ in $k2>k1$. Potem obstaja barvanje $f':V(G)\to [k2]$ grafa $G$.
+\end{lema}
+\begin{proof}
+    Dovolj je definirati $f'$ kot $f'(v) = f(v)$ za vsa vozlišča $v\in V(G)$. To je ustrezna definicija, ker je $k2>k1$.
+\end{proof}
+
+\begin{lema}
+    Graf $G$ je $k$-obarvljiv če in samo če je kromatično število grafa $G$ manjše ali enako $k$.
+\end{lema}
+\begin{proof}
+    Najprej dokažimo implikacijo v desno. Kromatično število smo definirali kot najmanjši $i$, da je graf $G$ $i$-obarvljiv.
+    Če je torej graf $G$ $k$-obarvljiv, potem je kromatično število grafa $G$ največ $k$.
+    V levo če vemo, da je kromatično število grafa $G$ največ $k$, potem obstaja barvanje grafa $G$ z največ $k$ barvami
+    ki ga lahko razširimo do barvanja s $k$ barvami po lemi 
+\end{proof}
+
+\subsection{Kromatična števila cikličnih grafov}
+\begin{figure}[H]
+    \begin{center}
+    \includegraphics[scale=0.5]{assets/C_n}
+    \caption{Primeri cikličnih grafov}
+    \label{slika_Cn}
+    \end{center}
+\end{figure}
+\begin{definicija}
+    Ciklični graf $C_n$ kjer je $n\geq 3$ je graf z $n$ vozlišči, kjer sta vozlišči $i$ in $j$ povezani
+    če in samo če je $|i-j|= 1$ ali pa velja $i=0$ in $j=n-1$ ali $j=0$ in $i=n-1$.
+\end{definicija}
+Da lažje primerjamo definicjo s sliko dokažimo naslednjo lemo. 
+\begin{lema}
+    Vsako vozlišče cikličnega grafa $C_n$ ima stopnjo 2.
+\end{lema}
+\begin{proof}
+    Denimo da je $0<i<n-1$. Potem so edine rešitve za $j$ enačbe $|i-j|=1$ enake $i-1$ in $i+1$. Torej je stopnja
+    res 2. Za $i=0$ sta edini možnosti $j=1$ kot rešitev enačbe in $j=n-1$ po drugem delu definicije. 
+    Za $i=n-1$ je edina veljavna rešitev enačbe $j=n-2$, drugo sosednje vozlišče pa je po definiciji $j=0$.
+\end{proof}
+
+Pri naslednjih dveh dokazih bomo določene podrobnosti prepustili bralcu.
+\begin{lema}
+    Če je $n$ sodo število, je kromatično število cikličnega grafa $C_n$ enako 2.
+\end{lema}
+\begin{proof}
+    Dokažimo da obstaja barvanje z dvema barvama. Barvanje definiramo kot $f(i) = i\mod 2$.
+    Z razdelitvija na primere se lahko prepričamo da je to barvanje veljavno. 
+    Ker ima graf $C_n$ vsaj eno povezavo, barvanje z $1$ barvno ne obstaja.
+    Torej je kromatično število grafa $C_n$ za sod $n$ enako 2.
+\end{proof}
+
+\begin{lema}
+    Če je $n$ liho število, je kromatično število cikličnega grafa $C_n$ enako 3.
+\end{lema}
+\begin{proof}
+    Dokažimo da obstaja barvanje z tremi barvami. Barvanje definiramo kot $f(i) = i\mod 2$ če $i \neq 0$ in $f(0) = 2$.
+    Z razdelitvijo na primere se lahko prepričamo da je to barvanje veljavno.
+
+    Dokažimo da barvanje z dvema barvama ne obstaja. Brez škode za splošnost je vozlišče $0$ pobarvano z barvo $0$.
+    Z indukcijo po $i$ bomo pokazali, da je vozlišče $i$ pobarvano z barvo $i\bmod 2$.
+    Za $i=0$ je to res. Predpostavimo, da je za nek $i$ vozlišče $i$ pobarvano z barvo $i\bmod 2$.
+    Ker sta vozlišči $i$ in $i+1$ povezani, je vozlišče $i+1$ pobarvano z barvo $i\bmod 2 + 1 = (i+1)\bmod 2$.
+    S tem smo končali indukcijo.
+    Poglejmo si sedaj vozlišči $0$ in $2n$. Po indukcijski predpostavki sta obe pobarvani z barvo $0$, 
+    vendar pa sta povezani, kar je protislovje. Torej 2 barvanje ne obstaja.
 \end{proof}
 
 
@@ -340,7 +409,7 @@ def jeVikend (d:DanVTednu) : Bool :=
     | _ => false
 \end{lstlisting}
 
-Vidimo, da lahko podobno kot v OCamlu uporabljamo tudi \lstinline{_} kot "wildcard" v match stavku.
+Vidimo, da lahko podobno kot v OCamlu uporabljamo \lstinline{_} v match stavku da pokrijemo vse možnosti, ki še niso bile pokrite.
 Objekti induktivnega tipa so lahko definirani tudi rekuzivno.
 \begin{lstlisting}
 inductive Nat where
@@ -459,7 +528,7 @@ instance {G : Graph} (k : Nat) : Decidable (is_k_colorable G k) := Fintype.decid
 \end{lstlisting}
 
 Sedaj lahko končno definiramo kromatično število grafa $G$ kot najmanjše število $k$, da velja
-\lstinline{is_k_colorable G k}. V Leanu (oziroma bolj natančno Mathlibu) to naredimo s pomočjo funkcije \lstinline{Nat.find},
+\lstinline{is_k_colorable G k}. V Leanu to naredimo s pomočjo funkcije \lstinline{Nat.find},
 ki kot argumente vzame:
 \begin{itemize}
     \item \lstinline{p : Nat → Prop}, izračunljiv predikat, za katerega iščemo najmanjše število, da velja \lstinline{p};
@@ -509,19 +578,13 @@ lemo, ki nam pove, da iz barvanja grafa $G$ s $k$ barvami lahko tvorimo barvanje
 \begin{lstlisting}
 def extend_coloring (G:Graph) (k1 k2: Nat) (h:k2≥k1) (coloring: Coloring G k1) (h2: valid_coloring G coloring):∃ coloring2:Coloring G k2, valid_coloring G coloring2
 \end{lstlisting}
-Nato lahko dokažemo, da $k$-barvanje grafa $G$ obstaja, če in samo če je kromatično število grafa $G$ največ $k$.
+Nato lahko, podobno kot smo to naredili v 2. poglavju, dokažemo, da $k$-barvanje grafa $G$ obstaja, če in samo če je kromatično število grafa $G$ največ $k$.
 \begin{lstlisting}
 lemma colorable_gives_ub (G: Graph) (k: Nat):
     is_k_colorable G k ↔ chromatic_number G ≤ k
 \end{lstlisting}
-\begin{proof}
-Najprej dokažimo implikacijo v desno. Kromatično število smo definirali kot najmanjši $i$, da je graf $G$ $i$-obarvljiv.
-Če je torej graf $G$ $k$-obarvljiv, potem je kromatično število grafa $G$ največ $k$.
-V levo če vemo, da je kromatično število grafa $G$ največ $k$, potem obstaja barvanje grafa $G$ z največ $k$ barvami
-ki ga lahko razširimo do barvanja s $k$ barvami po lemi \lstinline{extend_coloring}.
-\end{proof}
 
-Posledica je, da če in samo če barvanje s $k$ barvami ne obstaja, je $k$ manjši od kromatičnega števila grafa $G$.
+Posledica je, da barvanje s $k$ barvami ne obstaja če in samo če je $k$ manjši od kromatičnega števila grafa $G$.
 \begin{lstlisting}
 lemma not_colorable_gives_lb (G: Graph) (k: Nat) :
     ¬ is_k_colorable G k ↔ k < chromatic_number G
@@ -537,7 +600,6 @@ theorem bounds_give_chromatic (G:Graph) (k: Nat):
 Če sedaj na dokazano gledamo iz vidika uporabnosti, je precej preprosto Leanu razložiti, da je graf $G$ $k$-obarvljiv
  recimo tako, da najdemo neko barvanje. Večji problem pa je s spodnjo mejo kromatičnega števila. 
 V tem delu se bomo spodnje meje lotili s pomočjo podgrafov.
-
 
 \subsection{Podgrafi}
 Dokažimo naslednji izrek
@@ -562,43 +624,7 @@ tega v Leanu nismo naredili.
 
 Zdaj si lahko pomagamo pri iskanju spodnjih mej kromatičnega števila, tako da najdemo nek manjši podgraf, ki 
 ima čim večje kromatično število. V praksi se recimo pogosto uporablja $K_n$ klike, ki imajo kromatično število $n$, 
-ali pa $C_n$ ciklični grafi, ki imajo kromatično število $2$, če je $n$ sodo in $3$, če je $n$ liho število.
-
-V delu se bomo osredotočili na ciklične grafe.
-
-\subsection{Kromatično število cikličnih grafov}
-Dokažimo, da je kromatično število cikličnega grafa s sodim številom vozlišč enako $2$.
-\begin{lstlisting}
-theorem chromatic_number_of_C_n_even (n:Nat) (h:2*n≥2):
-    chromatic_number (C_n (2*n) h) = 2
-\end{lstlisting}
-\begin{proof}
-Potrebno je dokazati, da barvanje z 1 barvo ni mogoče in da obstaja barvanje z 2 barvama.
-Prvi del je očiten dovolj je pokazati, da ima graf vsaj eno povezavo, kar lahko naredimo, ker ima graf vsaj dve vozlišči.
-
-Za drugi del pa moramo najti barvanje z dvema barvama, edina rešitev (do permutacije barv) je, da vozlišče
-$n$ pobarvamo z $n\bmod 2$. Dokaz, da je barvanje pravilno je sicer v Leanu nekoliko dolg, ni pa se o tem
-težko prepričati, preveriti je potrebno le, da sta vozlišči $0$ in $2n-1$ ter za vsak $0\le i<2n-1$, $i$ in $i+1$ različne barve.
-\end{proof}
-
-Za pokritje vseh cikličnih grafov potrebujemo še dokaz, da je kromatično število cikličnega grafa s lihim številom vozlišč enako $3$.
-\begin{lstlisting}
-theorem chromatic_number_of_C_n_odd (n:Nat) (h:2*n+1≥2):
-    chromatic_number (C_n (2*n+1) h) = 3
-\end{lstlisting}
-\begin{proof}
-Kot prej je dovolj dokazati, da $2$-barvanje ne obstaja, ter najti $3$-barvanje. 
-Za $3$-barvanje vzamemo preslikavo, ki vozlišče $i$ slika v $i\bmod 2$, razen če je $i=0$, ki ga slika v $2$.
-Podobno kot pri sodem številu vozlišč se je precej enostavno prepričati da je to barvanje res veljavno. 
-
-Sedaj moramo dokazati, da $2$-barvanje ne obstaja. Brez škode za splošnost je vozlišče $0$ pobarvano z barvo $0$.
-Z indukcijo po $i$ bomo pokazali, da je vozlišče $i$ pobarvano z barvo $i\bmod 2$.
-Za $i=0$ je to res. Predpostavimo, da je za nek $i$ vozlišče $i$ pobarvano z barvo $i\bmod 2$.
-Ker sta vozlišči $i$ in $i+1$ povezani, je vozlišče $i+1$ pobarvano z barvo $i\bmod 2 + 1 = (i+1)\bmod 2$.
-S tem smo končali indukcijo.
-Poglejmo si sedaj vozlišči $0$ in $2n$. Po lemi sta obe pobarvani z barvo $0$, vendar pa sta povezani, kar je protislovje.
-Torej 2 barvanje ne obstaja. 
-\end{proof}
+ali pa $C_n$ ciklični grafi, ki imajo kromatično število $2$, če je $n$ sodo in $3$, če je $n$ liho število kot smo dokazali v 2. poglavju. 
 
 \subsection{$2$-obarvljivost}
 Hitri algoritmi za računanje kromatičnega števila v splošnem niso znani, 
@@ -636,8 +662,8 @@ def is_k_colorable (G : Graph) (k: Nat) : Prop :=
 
 Obarvljivost torej preverimo tako, da preverimo, ali izmed vseh mogočih barvanj obstaja barvanje z $k$ barvami.
 
-Poglejmo si nekaj grafov porabe časa tega algoritma. Za testiranje algoritma bomo uporabili Erdős–Rényijeve grafe
-ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ vozlišči, kjer je vsaka povezava prisotna z verjetnostjo $p$.
+Poglejmo si nekaj grafov porabe časa tega algoritma. Za testiranje algoritma bomo naključno generirali grafe na $n$ vozliščih
+kjer bo vsaka povezava prisotna z verjetnostjo $p$. Označimo tak tip grafov z $G(n, p)$.
 
 \begin{figure}[H]
 \begin{center}
@@ -663,7 +689,7 @@ ki jih označimo z $G(n, p)$. Model $G(n, p)$ nam vrne naključen graf z $n$ voz
 \end{center}
 \end{figure}
 
-Grafe smo pridobili tako, da je Python klical prevejeno Lean kodo in beležil čas izvajanja. Lean program je zgeneriral 1000
+Grafe smo pridobili tako, da je Python klical prevejeno Lean kodo in beležil čas izvajanja. Program v Leanu je zgeneriral 1000
 naključnih grafov $G(n, p)$ ter za vsakega preveril, ali je $k$-obarvljiv, kjer je bil $k$ podan kot argument programa.
 Čas računanja torej opiše čas, porabljen za izračun na 1000 grafih za bolj stabilne rezultate. Program se je izvajal
 na računalniku z AMD Ryzen 9 7950x procesorjem in zadostno količino delavnega pomnilnika, kjer pa se nismo posebej trudili
@@ -701,6 +727,7 @@ na strukturi povezanega seznama in zato pričakovano počasnejši.
 \end{figure}
 
 Še vedno ima nelinearno časovno zahtevnost, kar pa je smiselno, ker imamo recimo $O(n^2)$ povezav z našim $G(n, p)$ modelom.
+
 
 \section{Zaključek}
 Ugotovili smo, da je Lean 4 primeren jezik za implementacijo in dokazovanje pravilnosti algoritmov za računanje kromatičnega
