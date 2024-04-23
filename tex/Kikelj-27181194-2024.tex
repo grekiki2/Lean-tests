@@ -76,7 +76,7 @@ Na koncu definiramo nekaj algoritmov za iskanje kromatičnega števila in dokaž
     \end{itemize}
 \end{definicija}
 Če sta različni vozlišči $u, v$ elementa neke povezave iz $E$, to pišemo kot $u\sim v$ ter pravimo, da sta sosednji vozlišči in da sta krajišči povezave $uv\in E$.
-Opomba: Iz definicije vidimo, da se bomo ukvarjali z enostavnimi končnimi neusmerjenimi grafi, ker je cilj preverjati lastnosti za konkretne grafe ki jih
+Opomba: Iz definicije vidimo, da se ukvarjamo z enostavnimi končnimi neusmerjenimi grafi, ker je cilj preverjati lastnosti za konkretne grafe ki jih
 lahko predstavimo v računalniku.
 
 \begin{figure}[H]
@@ -193,7 +193,7 @@ Da lažje primerjamo definicjo s sliko dokažimo naslednjo lemo.
     Za $i=n-1$ je edina veljavna rešitev enačbe $j=n-2$, drugo sosednje vozlišče pa je po definiciji $j=0$.
 \end{proof}
 
-Pri naslednjih dveh dokazih bomo določene podrobnosti prepustili bralcu.
+Pri naslednjih dveh dokazih so določene podrobnosti prepuščene bralcu.
 \begin{lema}
     Če je $n$ sodo število, je kromatično število cikličnega grafa $C_n$ enako 2.
 \end{lema}
@@ -225,11 +225,11 @@ Pri naslednjih dveh dokazih bomo določene podrobnosti prepustili bralcu.
 Dokazovalni pomočniki so orodja, ki omogočajo formalizacijo matematičnih izrekov in dokazov ter algoritmov znotraj nekega logičnega okvira. 
 Ti programi so koristni predvsem v matematiki in računalništvu, saj nudijo formalno verifikacijo dokazov, s tem pa 
 povečujejo zanesljivost algoritmov.
-Med številnimi dokazovalnimi pomočniki, kot so Coq, Agda in Isabelle, smo za naše delo izbrali Lean iz več razlogov, predvsem
+Med številnimi dokazovalnimi pomočniki, kot so Coq, Agda in Isabelle, za naše delo izberemo Lean iz več razlogov, predvsem
 zaradi enostavnosti uporabe, aktivne skupnosti in primernosti za dokazovanje pravilnosti algoritmov. 
 
-Lean je interaktivni dokazovalni pomočnik. Uporabljali bomo verzijo Lean 4, ki je razvita pri Microsoftu in temelji na teoriji tipov
-s čimer se ne bomo ukvarjali, ker je tema te diplomske naloge teorija grafov. Lean 4 smo uporabljali tudi
+Lean je interaktivni dokazovalni pomočnik. Uporabljamo verzijo Lean 4, ki je razvita pri Microsoftu in temelji na teoriji tipov
+s čimer se ne ukvarjamo, ker je tema te diplomske naloge teorija grafov. Lean 4 uporabljamo tudi
 kot funkcijski programski jezik. Za bolj natančne podrobnosti o Leanu priporočamo ogled uradne dokumentacije. 
 
 
@@ -252,7 +252,7 @@ ki se izračuna v 9.
 \subsection{Tipi}
 Tipe poznamo iz drugih programskih jezikov (npr. Python, Java), so pa v Leanu bolj pomembni in imajo nekaj več funkcionalnosti.
 
-Osnovni tipi, s katerimi se bomo največ ukvarjali, so:
+Osnovni tipi, s katerimi se največ ukvarjamo, so:
 \begin{itemize}
     \item \lstinline{Nat}, naravna števila;
     \item \lstinline{Int}, cela števila;
@@ -275,7 +275,7 @@ Poglejmo si sedaj, kako definiramo funkcije
 \begin{lstlisting}
 def f (x : ℕ) : ℕ := x + 1
 \end{lstlisting}
-Definirali smo funkcijo \lstinline{f}, ki sprejme naravno število in vrne naravno število. Funkcijo lahko poračunamo podobno kot izraze
+Definiramo funkcijo \lstinline{f}, ki sprejme naravno število in vrne naravno število. Funkcijo lahko poračunamo podobno kot izraze
 \begin{lstlisting}
 #eval f 2
 \end{lstlisting}
@@ -493,7 +493,7 @@ Definiramo še tip, ki predstavlja $k$-barvanje grafa
 def Coloring (G:Graph) (k : Nat) := Fin G.vertexSize → Fin k
 \end{lstlisting}
 
-Predstavili smo $k$-barvanje grafa kot preslikavo iz (indeksa) vozlišča v eno izmed $k$ barv.
+Predstavimo $k$-barvanje grafa kot preslikavo iz (indeksa) vozlišča v eno izmed $k$ barv.
 Definiramo še, kdaj je $k$-barvanje veljavno
 \begin{lstlisting}
 def valid_coloring (G:Graph) {k:Nat} (coloring: Coloring G k): Prop :=
@@ -598,8 +598,8 @@ theorem bounds_give_chromatic (G:Graph) (k: Nat):
 \end{lstlisting}
 
 Če sedaj na dokazano gledamo iz vidika uporabnosti, je precej preprosto Leanu razložiti, da je graf $G$ $k$-obarvljiv
- recimo tako, da najdemo neko barvanje. Večji problem pa je s spodnjo mejo kromatičnega števila. 
-V tem delu se bomo spodnje meje lotili s pomočjo podgrafov.
+recimo tako, da najdemo neko barvanje. Večji problem pa je s spodnjo mejo kromatičnega števila. 
+V tem delu se spodnje meje lotimo s pomočjo podgrafov.
 
 \subsection{Podgrafi}
 Dokažimo naslednji izrek
@@ -629,11 +629,11 @@ ali pa $C_n$ ciklični grafi, ki imajo kromatično število $2$, če je $n$ sodo
 \subsection{$2$-obarvljivost}
 Hitri algoritmi za računanje kromatičnega števila v splošnem niso znani, 
 ve se, da je na primer problem določiti ali je graf $3$-obarvljiv, NP poln.
-Za $2$-obarvljivost pa hiter algoritem obstaja in ga bomo tudi implementirali v Leanu ter dokazali njegovo pravilnost. 
-Naš trenuten algoritem porabi $O(n^22^n)$ časa, kjer je $n$ število vozlišč grafa, ker mora pregledati vsa možna barvanja.
+Za $2$-obarvljivost pa hiter algoritem obstaja in ga tudi implementiramo v Leanu ter dokažemo njegovo pravilnost. 
+Naš trenuten algoritem porabi eksponentno količino časa glede na število vozlišč, ker mora pregledati vsa možna barvanja.
 
 Implementacija hitrejše verzije je dostopna na \url{https://github.com/grekiki2/Lean-tests/blob/chromatic-2/Graph/2Colorable.lean}, tukaj pa
-bomo opisali princip delovanja. 
+opišemo princip delovanja. 
 Za enostavnost predpostavimo, da je graf povezan.
 Algoritem vozlišče $0$ pobarva z barvo $0$ in začne z iskanjem v širino. Za vsako vozlišče razen vozlišča 0, se tudi beleži
 predhodnika oziroma vozlišče, iz katerega smo prišli. Ko obiščemo novo vozlišče, ga poskusimo pobarvati drugače od vseh sosedov.
@@ -650,7 +650,7 @@ ne pa tudi hitrosti.
 
 
 \section{Rezultati in meritve}
-V tem poglavju bomo predstavili rezultate in meritve.
+V tem poglavju predstavimo rezultate in meritve.
 Ker kromatično število vedno računamo s tem, da gledamo, ali je graf $k$-obarvljiv, bodo tudi ocene hitrosti zaradi enostavnosti
 primerjale hitrosti implementacij $k$-obarvljivosti za različne $k$ in različne algoritme, ki smo jih implementirali. 
 
@@ -704,7 +704,7 @@ Vidimo, da je za preverjanje $3$ in $5$-obarvljivosti algoritem počasnejši, ve
 številu povezav verjetnost, da barvanje obstaja manjše, zato program ne more ustaviti izvajanja, ko najde veljavno barvanje. 
 Pri $2$-obarvljivosti ta opazka o hitrosti iz neznanih razlogov ne velja. 
 
-Na podoben način smo preizkusili tudi hitrejši algoritem za preverjanje $2$-obarvljivosti.
+Na podoben način preizkusimo tudi hitrejši algoritem za preverjanje $2$-obarvljivosti.
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.4]{assets/2barvFast}
@@ -715,7 +715,7 @@ Na podoben način smo preizkusili tudi hitrejši algoritem za preverjanje $2$-ob
 
 Vidimo da je algoritem za katerega smo trdili, da je hitrejši brez dokaza, (in dokazali pravilnost), res bistveno hitrejši.
 Pomembno je tudi, da je tukaj $y$ os krajša kot v prejšnjih grafih.
-Za primerjavo različnih podatkovnih struktur smo enak algoritem pognali tudi na leanovem tipu \lstinline{List} ki pa je osnovan
+Za primerjavo različnih podatkovnih struktur enak algoritem poženemo tudi na leanovem tipu \lstinline{List} ki pa je osnovan
 na strukturi povezanega seznama in zato pričakovano počasnejši.
 
 \begin{figure}[H]
@@ -730,7 +730,7 @@ na strukturi povezanega seznama in zato pričakovano počasnejši.
 
 
 \section{Zaključek}
-Ugotovili smo, da je Lean 4 primeren jezik za implementacijo in dokazovanje pravilnosti algoritmov za računanje kromatičnega
+Ugotovimo, da je Lean 4 primeren jezik za implementacijo in dokazovanje pravilnosti algoritmov za računanje kromatičnega
 števila grafov. Dodatne teme, ki bi bile zanimive za raziskovanje, so dokazovanje, da hiter algoritem vedno deluje pravilno,
 (torej da vrne pravilno barvanje ali lih cikel in da se ne more zgoditi, da mora Lean uporabiti počasno verzijo algoritma),
 ugotavljanje večjega števila invariant na grafih ter implementacija hitrih algoritmov s pričami v hitrejših jezikih.
