@@ -31,8 +31,8 @@ Finally, we implement and prove the correctness of an algorithm for checking 2-c
 \geslo{Chromatic number}{Kromatično število}
 }
 
-% - ime datoteke z viri (vključno s končnico .bib), če uporabljate BibTeX
-% \literatura{....bib}
+\usepackage{biblatex}
+\addbibresource{literatura.bib}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -626,7 +626,7 @@ Zdaj si lahko pomagamo pri iskanju spodnjih mej kromatičnega števila, tako da 
 ima čim večje kromatično število. V praksi se recimo pogosto uporablja $K_n$ klike, ki imajo kromatično število $n$, 
 ali pa $C_n$ ciklični grafi, ki imajo kromatično število $2$, če je $n$ sodo in $3$, če je $n$ liho število kot smo dokazali v 2. poglavju. 
 
-\subsection{$2$-obarvljivost}
+\subsection{2-obarvljivost}
 Hitri algoritmi za računanje kromatičnega števila v splošnem niso znani, 
 ve se, da je na primer problem določiti ali je graf $3$-obarvljiv, NP poln.
 Za $2$-obarvljivost pa hiter algoritem obstaja in ga tudi implementiramo v Leanu ter dokažemo njegovo pravilnost. 
@@ -733,5 +733,8 @@ na strukturi povezanega seznama in zato pričakovano počasnejši.
 Ugotovimo, da je Lean 4 primeren jezik za implementacijo in dokazovanje pravilnosti algoritmov za računanje kromatičnega
 števila grafov. Dodatne teme, ki bi bile zanimive za raziskovanje, so dokazovanje, da hiter algoritem vedno deluje pravilno,
 (torej da vrne pravilno barvanje ali lih cikel in da se ne more zgoditi, da mora Lean uporabiti počasno verzijo algoritma),
-ugotavljanje večjega števila invariant na grafih ter implementacija hitrih algoritmov s pričami v hitrejših jezikih.
+ugotavljanje večjega števila invariant na grafih ter implementacija hitrih algoritmov s pričami v hitrejših jezikih. \cite{mycoderef}
+
+\printbibliography
+
 \end{document}
