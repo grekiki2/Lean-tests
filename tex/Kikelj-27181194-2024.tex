@@ -264,38 +264,38 @@ Lean načeloma tipe izrazov ugotovi sam, lahko pa jih tudi podamo. Na primer
 \begin{lstlisting}
 #eval 2
 \end{lstlisting}
-se izračuna v 2, Lean pa nam pove, da je tip izraza \lstinline{Nat}. Če pa želimo izraz izračunati kot \lstinline{Int}, lahko to naredimo z
+se izračuna v 2, Lean pa nam pove, da je tip izraza \lstinline{Nat}. Če pa želimo izraz izračunati kot \lstinline{Int}, lahko to naredimo z naslednjim ukazom.
 \begin{lstlisting}
 #eval (2 : Int)
 \end{lstlisting}
-kar nam potem predstavlja 2 kot celo število. Lean ponavadi namesto
+To nam potem predstavlja 2 kot celo število. Lean ponavadi namesto
 \lstinline{Nat} uporabi oznako \lstinline{ℕ} in namesto \lstinline{Int} oznako \lstinline{ℤ}, to pa lahko uporabljamo tudi mi
 da se program bolj ujema z matematičnim zapisom. 
 
-Poglejmo si sedaj, kako definiramo funkcije
+Poglejmo si sedaj, kako definiramo funkcije.
 \begin{lstlisting}
 def f (x : ℕ) : ℕ := x + 1
 \end{lstlisting}
-Definiramo funkcijo \lstinline{f}, ki sprejme naravno število in vrne naravno število. Funkcijo lahko poračunamo podobno kot izraze
+Definiramo funkcijo \lstinline{f}, ki sprejme naravno število in vrne naravno število. Funkcijo lahko poračunamo podobno kot izraze.
 \begin{lstlisting}
 #eval f 2
 \end{lstlisting}
-ki se izračuna v 3. Če nismo prepričani kakšen tip ima nek objekt v Leanu lahko to ugotovimo z ukazom
+Izraz se izračuna v 3. Če nismo prepričani kakšen tip ima nek objekt v Leanu lahko to ugotovimo z naslednjim ukazom.
 \begin{lstlisting}
 #check f
 \end{lstlisting}
-ki nam vrne \lstinline{ℕ → ℕ}, torej je funkcija $f$ preslikava iz naravnih števil v naravna števila.
+Ukaz nam vrne \lstinline{ℕ → ℕ}, torej je funkcija $f$ preslikava iz naravnih števil v naravna števila.
 
-Lahko definiramo tudi funkcije več spremenljivk
+Lahko definiramo tudi funkcije več spremenljivk.
 \begin{lstlisting}
 def vsota (x: ℕ) (y: ℕ) : ℕ := x + y
 \end{lstlisting}
-ki ima tip \lstinline{ℕ → ℕ → ℕ}, torej je preslikava iz naravnih števil v preslikave iz naravnih števil v naravna števila.
-Ker imata oba argumenta funkcije isti tip, lahko definicijo skrajšamo
+Funkcija ima tip \lstinline{ℕ → ℕ → ℕ}, torej je preslikava iz naravnih števil v preslikave iz naravnih števil v naravna števila.
+Ker imata oba argumenta funkcije isti tip, lahko definicijo skrajšamo.
 \begin{lstlisting}
 def vsota (x y: ℕ) : ℕ := x + y
 \end{lstlisting}
-Ker zna Lean sam ugotoviti tip vsote dveh naravnih števil, tega ni potrebno podati, je pa včasih to bolj berljivo
+Ker zna Lean sam ugotoviti tip vsote dveh naravnih števil, tega ni potrebno podati, je pa včasih to bolj berljivo.
 \begin{lstlisting}
 def vsota (x y: ℕ) := x + y
 \end{lstlisting}
@@ -304,21 +304,21 @@ def vsota (x y: ℕ) := x + y
 λx y:ℕ=>x+y
 \end{lstlisting}
 
-Lean v funkcijah podpira tudi bolj ">običajno"< programiranje. Lahko recimo definiramo pomožne spremenljivke
+Lean v funkcijah podpira tudi bolj ">običajno"< programiranje. Lahko recimo definiramo pomožne spremenljivke.
 \begin{lstlisting}
 def funkcija (a:Nat) : Nat := 
   let b := a+1
   b*b
 \end{lstlisting}
 
-Lahko tudi kličemo druge funkcije
+Lahko tudi kličemo druge funkcije.
 \begin{lstlisting}
 def funkcija2 (a:Nat) : Nat :=
     let b := funkcija a
     b*b
 \end{lstlisting}
 
-Imamo tudi možnost uporabe stavka \lstinline{if}
+Imamo tudi možnost uporabe stavka \lstinline{if}.
 \begin{lstlisting}
 def funkcija3 (a:Nat) : Bool :=
   if a = 0 then
@@ -334,9 +334,9 @@ def funkcija4 (a:Nat) : Nat :=
     else
       1 + funkcija4 (a-1)
 \end{lstlisting}
-kjer pa moramo poskrbeti, da se rekurzija zaključi. Včasih Lean pri tem potrebuje nekaj pomoči, detajli o tem so izven obsega te diplomske naloge.
+Pri rekurziji moramo poskrbeti, da se izvajanje zaključi. Včasih Lean pri tem potrebuje nekaj pomoči, detajli o tem so izven obsega te diplomske naloge.
 
-Stavke if, rekurzijo in pomožne spremenljivke uporabljamo tudi v funkcijah več spremenljivk.
+Stavke \lstinline{if}, rekurzijo in pomožne spremenljivke uporabljamo tudi v funkcijah več spremenljivk.
 \begin{lstlisting}
 def vecje (n : Nat) (k : Nat) : Nat :=
   if n < k then
@@ -361,16 +361,16 @@ structure Tocka :=
     x: Nat
     y: Nat
 \end{lstlisting}
-Objekt neke strukture definiramo tako, da navedemo vrednosti vseh polj
+Objekt neke strukture definiramo tako, da navedemo vrednosti vseh polj.
 \begin{lstlisting}
 def izhodisce : Tocka := {x := 0, y := 0}
 \end{lstlisting}
 Tudi te tipe lahko uporabljamo kot argumente ali rezultate funkcij.
-Dostop do posameznih komponent strukture je podoben kot v večini programskih jezikov
+Dostop do posameznih komponent strukture je podoben kot v večini programskih jezikov.
 \begin{lstlisting}
 #eval izhodisce.x
 \end{lstlisting}
-torej z \lstinline{ime_objekta.ime_komponente}.
+Do posameznih komponent torej dostopamo z \lstinline{ime_objekta.ime_komponente}.
 
 \subsubsection{Induktivni tipi}
 Poleg struktur, ki zapakirajo več podatkov v en objekt, Lean podpira tudi induktivne tipe, ki nam omogočajo, da definiramo objekt nekega tipa
@@ -381,7 +381,7 @@ inductive Bool where
 | true : Bool
 \end{lstlisting}
 
-Bolj realen primer bi bil recimo dan v tednu
+Bolj realen primer bi bil recimo dan v tednu.
 \begin{lstlisting}
 inductive DanVTednu where
 | ponedeljek : DanVTednu
@@ -489,13 +489,13 @@ let g1 : Graph := {
 Podobno bi lahko naredili tudi z grafom, ki bi za seznam sosednosti uporabljal tip \lstinline{List}, vendar pa je uporaba \lstinline{Array} 
 bolj učinkovita.
 
-Definiramo še tip, ki predstavlja $k$-barvanje grafa
+Definiramo še tip, ki predstavlja $k$-barvanje grafa.
 \begin{lstlisting}
 def Coloring (G:Graph) (k : Nat) := Fin G.vertexSize → Fin k
 \end{lstlisting}
 
 Predstavimo $k$-barvanje grafa kot preslikavo iz (indeksa) vozlišča v eno izmed $k$ barv.
-Definiramo še, kdaj je $k$-barvanje veljavno
+Definiramo še, kdaj je $k$-barvanje veljavno.
 \begin{lstlisting}
 def valid_coloring (G:Graph) {k:Nat} (coloring: Coloring G k): Prop :=
   ∀ a b, GraphConnected G a b → coloring a ≠ coloring b
@@ -504,11 +504,11 @@ Sledimo definiciji iz drugega poglavja. Torej z besedami, barvanje je veljavno,
 če sta sosednji vozlišči vedno pobarvani z različnima barvama.
 
 Ker preslikava preverja povezanost za končno število elementov, se lahko uporablja za računanje. Drugače rečeno, smiselno
-je napisati
+je napisati in pričakovati da Lean poračuna naslednji izraz.
 \begin{lstlisting}
 #eval valid_coloring (K_n 5) (λ x => 0)
 \end{lstlisting}
-in pričakovati, da Lean to izračuna. Lean na žalost izračunljivosti tega izraza ne ugotovi sam, zato moramo pokazati,
+Lean na žalost izračunljivosti funkcije \lstinline{valid_coloring} ne ugotovi sam, zato moramo dokazati,
 da je \lstinline{valid_coloring} izračunljiva funkcija oziroma v Leanu \lstinline|Decidable|.
 \begin{lstlisting}
 instance (G: Graph) (k:Nat) (coloring: Coloring G k): Decidable (@valid_coloring G k coloring)
@@ -517,7 +517,7 @@ instance (G: Graph) (k:Nat) (coloring: Coloring G k): Decidable (@valid_coloring
 
 Zdaj lahko torej za neko barvanje z Leanom preverimo, ali je veljavno ali ne. 
 Ker je množica barvanj grafa $G$ s $k$ barvami končna, lahko definiramo tudi izračunljivo funkcijo, ki nam 
-za graf $G$ pove, ali obstaja $k$-barvanje
+za graf $G$ pove, ali obstaja $k$-barvanje.
 \begin{lstlisting}
 def is_k_colorable (G : Graph) (k: Nat) : Prop :=
   ∃ (coloring : Coloring G k), valid_coloring G coloring
@@ -536,7 +536,7 @@ ki kot argumente vzame:
     \item \lstinline{h : ∃ n, p n}, dokaz, da obstaja neko naravno število, za katerega velja \lstinline{p}.
 \end{itemize}
 
-Definicija kromatičnega števila v Leanu je potem
+Definicija kromatičnega števila v Leanu je potem naslednja.
 \begin{lstlisting}
 def ChromaticNumber (G: Graph): ℕ :=
   @Nat.find (is_k_colorable G) _ (by {
@@ -554,19 +554,20 @@ V poglavju 2 smo se prepričali, da je to res veljavno barvanje.
 
 \subsection{Računanje kromatičnega števila}
 Funkcijo \lstinline{chromatic_number} Lean prepozna kot izračunljivo in jo lahko že uporabljamo za interaktivno računanje
-kromatičnega števila. Na primer
+kromatičnega števila. Nasledji primeri so izračuni kromatičnega števila za nekaj preprostih grafov.
 \begin{lstlisting}
 #eval ChromaticNumber (K_n 8)
 \end{lstlisting}
-nam vrne 8 (po nekaj sekundah). Podobno nam
 \begin{lstlisting}
 #eval ChromaticNumber (C_n 13 (by linarith))
 \end{lstlisting}
-vrne 3 in
 \begin{lstlisting}
 #eval ChromaticNumber (C_n 14 (by linarith))
 \end{lstlisting}
-vrne 2. Za računanje kromatičnega števila seveda obstajo hitrejši algoritmi, kot je naša definicija, 
+Prvi primer nam za graf $K_8$ vrne 8, kar je pričakovano, saj je $K_8$ poln graf in je kromatično število enako številu vozlišč, 
+drugi in tretji primer pa vrneta $3$ in $2$, kar je prav tako pričakovano, saj smo v prejšnjem poglavju pokazali, 
+da je kromatično število cikličnih grafov enako $3$ za liho število in $2$ za sodo število vozlišč.
+Za računanje kromatičnega števila seveda obstajo hitrejši algoritmi, kot je naša definicija, 
 ki deluje tako, da preveri vsa možna barvanja pri nekem $k$, dokler ne najde veljavnega ali pa gre 
 na naslednji $k$, vendar pa je dokazovanje pravilnosti kompleksnejših algoritmov precej zahtevno.
 
@@ -603,7 +604,7 @@ recimo tako, da najdemo neko barvanje. Večji problem pa je s spodnjo mejo kroma
 V tem delu se spodnje meje lotimo s pomočjo podgrafov.
 
 \subsection{Podgrafi}
-Dokažimo naslednji izrek
+Dokažimo naslednji izrek.
 \begin{lstlisting}
 theorem subgraph_chromatic_number_le (G G2:Graph) (f:Fin G2.vertexSize → Fin G.vertexSize) (f_inherits: ∀ a b, G2.connected a b → G.connected (f a) (f b)):
     ChromaticNumber G2 ≤ ChromaticNumber G
