@@ -431,7 +431,7 @@ inductive List (α : Type) where
 \subsection{Formalizacija kromatičnega števila}
 Poglejmo si definicijo kromatičnega števila v Leanu.
 Za berljivost bomo večino dokazov spuščali.
-Celotna koda je dostopna na \url{https://github.com/grekiki2/Lean-tests}.
+Celotna koda je dostopna na \cite{leanG}.
 Vsekakor je v primerjavi s papirjem dokaze bolj smiselno in enostavno pregledovati znotraj urejevalnika, na primer VSCode, ki nam omogoča, da v vsakem delu dokaza vidimo 
 trenutne predpostavke in željen rezultat. 
 
@@ -632,7 +632,7 @@ ve se, da je na primer problem določiti ali je graf $3$-obarvljiv, NP poln.
 Za $2$-obarvljivost pa hiter algoritem obstaja in ga tudi implementiramo v Leanu ter dokažemo njegovo pravilnost. 
 Naš trenuten algoritem porabi eksponentno količino časa glede na število vozlišč, ker mora pregledati vsa možna barvanja.
 
-Implementacija hitrejše verzije je dostopna na \url{https://github.com/grekiki2/Lean-tests/blob/chromatic-2/Graph/2Colorable.lean}, tukaj pa
+Implementacija hitrejše verzije je dostopna na \cite{leanG}, tukaj pa
 opišemo princip delovanja. 
 Za enostavnost predpostavimo, da je graf povezan.
 Algoritem vozlišče $0$ pobarva z barvo $0$ in začne z iskanjem v širino. Za vsako vozlišče razen vozlišča 0, se tudi beleži
@@ -733,7 +733,7 @@ na strukturi povezanega seznama in zato pričakovano počasnejši.
 Ugotovimo, da je Lean 4 primeren jezik za implementacijo in dokazovanje pravilnosti algoritmov za računanje kromatičnega
 števila grafov. Dodatne teme, ki bi bile zanimive za raziskovanje, so dokazovanje, da hiter algoritem vedno deluje pravilno,
 (torej da vrne pravilno barvanje ali lih cikel in da se ne more zgoditi, da mora Lean uporabiti počasno verzijo algoritma),
-ugotavljanje večjega števila invariant na grafih ter implementacija hitrih algoritmov s pričami v hitrejših jezikih. \cite{mycoderef}
+ugotavljanje večjega števila invariant na grafih ter implementacija hitrih algoritmov s pričami v hitrejših jezikih. 
 
 \printbibliography
 
